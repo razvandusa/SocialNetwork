@@ -1,9 +1,6 @@
 package org.example.service;
 
-import org.example.domain.Duck;
-import org.example.domain.DuckType;
-import org.example.domain.Person;
-import org.example.domain.User;
+import org.example.domain.*;
 import org.example.exceptions.EntityNotFoundException;
 import org.example.exceptions.validationExceptions.duckExceptions.DuckTypeValidationException;
 import org.example.exceptions.validationExceptions.duckExceptions.ResistanceValidationException;
@@ -73,7 +70,20 @@ public class UserService extends AbstractService<Long, User> {
                 } catch (NumberFormatException e) {
                     throw new ResistanceValidationException("Resistance must be a valid number");
                 }
-                Duck duck = new Duck(generateID(),userType,username,email,password,DuckType.valueOf(duckType),doubleSpeed,doubleResistance);
+                Duck duck;
+                switch (duckType) {
+                    case "SWIMMING":
+                        duck = new SwimmingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
+                        break;
+                    case "FLYING":
+                        duck = new FlyingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
+                        break;
+                    case "FLYING_AND_SWIMMING":
+                        duck = new FlyingSwimmingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
+                        break;
+                    default:
+                        throw new DuckTypeValidationException("Invalid duck type: " + duckType);
+                }
                 validatorUser.validate(duck);
                 repository.add(duck);
                 break;

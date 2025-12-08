@@ -1,7 +1,6 @@
 package org.example.validation;
 
 import org.example.domain.Duck;
-import org.example.domain.DuckType;
 import org.example.domain.Person;
 import org.example.domain.User;
 import org.example.exceptions.validationExceptions.duckExceptions.ResistanceValidationException;
@@ -50,10 +49,9 @@ public class UserValidationStrategy implements ValidationStrategy<User> {
             String occupation = person.getOccupation();
             validatePersonFields(surname, name, birthdate, occupation);
         } else if (user instanceof Duck duck) {
-            DuckType duckType = duck.getDuckType();
             Double speed = duck.getSpeed();
             Double resistance = duck.getResistance();
-            validateDuckFields(duckType, speed, resistance);
+            validateDuckFields(speed, resistance);
         }
     }
 
@@ -110,7 +108,7 @@ public class UserValidationStrategy implements ValidationStrategy<User> {
         }
     }
 
-    private void validateDuckFields(DuckType duckType, Double speed, Double resistance) {
+    private void validateDuckFields(Double speed, Double resistance) {
         validateSpeed(speed);
         validateResistance(resistance);
     }

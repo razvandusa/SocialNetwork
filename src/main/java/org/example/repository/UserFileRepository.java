@@ -1,9 +1,6 @@
 package org.example.repository;
 
-import org.example.domain.Duck;
-import org.example.domain.DuckType;
-import org.example.domain.Person;
-import org.example.domain.User;
+import org.example.domain.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -50,10 +47,18 @@ public class UserFileRepository extends AbstractFileRepository<Long, User> {
             DuckType duckType = DuckType.valueOf(data.get(5));
             Double speed = Double.parseDouble(data.get(6));
             Double resistance = Double.parseDouble(data.get(7));
-            return new Duck(id, userType, username, email, password, duckType, speed, resistance);
+            switch (duckType) {
+                case SWIMMING:
+                    return new SwimmingDuck(id, userType, username, email, password, speed, resistance);
+                case FLYING:
+                    return new FlyingDuck(id, userType, username, email, password, speed, resistance);
+                case FLYING_AND_SWIMMING:
+                    return new FlyingSwimmingDuck(id, userType, username, email, password, speed, resistance);
+            }
         } else {
             throw new IllegalArgumentException("Invalid user type: " + userType);
         }
+        return null;
     }
 
     /**
@@ -80,9 +85,18 @@ public class UserFileRepository extends AbstractFileRepository<Long, User> {
             return id + ';' + userType + ';' + username + ';' + email + ';' + password + ';' + surname + ';' + name + ';' + birthdate + ';' + occupation;
         } else if (userType.equals("Duck")) {
             Duck duck = (Duck) entity;
-            String duckType = duck.getDuckType().toString();
+            String duckType;
             String speed = duck.getSpeed().toString();
             String resistance = duck.getResistance().toString();
+            if (duck instanceof Swimmer && duck instanceof Flyer) {
+                duckType = "FLYING_AND_SWIMMING";
+            } else if (duck instanceof Swimmer) {
+                duckType = "SWIMMING";
+            } else if (duck instanceof Flyer) {
+                duckType = "FLYING";
+            } else {
+                throw new IllegalArgumentException("Invalid duck type: " + userType);
+            }
             return id + ';' + userType + ';' + username + ';' + email + ';' + password + ';' + duckType + ';' + speed + ';' + resistance;
         } else {
             throw new IllegalArgumentException("Invalid user type: " + userType);
