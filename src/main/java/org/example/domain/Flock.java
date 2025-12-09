@@ -3,34 +3,57 @@ package org.example.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Flock<T extends Duck> {
-    private Long id;
-    private String FlockName;
-    List<T> members;
+public class Flock extends Entity<Long> {
+    private String flockName;
+    List<Duck> ducks;
+    private final String flockType;
 
-    public Flock(Long id, String FlockName) {
-        this.id = id;
-        this.FlockName = FlockName;
-        members = new ArrayList<>();
+    public Flock(Long id, String FlockName, String flockType) {
+        super(id);
+        this.flockName = FlockName;
+        this.flockType = flockType;
+        ducks = new ArrayList<>();
     }
 
-    Long getId() { return id; }
-    String getFlockName() { return FlockName; }
-    List<T> getMembers() { return members; }
+    public String getFlockName() { return flockName; }
+    public String getFlockType() { return flockType; }
+    public List<Duck> getDucks() { return ducks; }
 
-    void setId(Long id) { this.id = id; }
-    void setFlockName(String FlockName) { this.FlockName = FlockName; }
-    void setMembers(List<T> members) { this.members = members; }
+    public void setFlockName(String flockName) { this.flockName = flockName; }
+    public void setDucks(List<Duck> ducks) { this.ducks = ducks; }
 
     public Double getAveragePerformance() {
         Double totalSpeed = 0.0;
         Double totalResistance = 0.0;
 
-        for (T duck : members) {
+        for (Duck duck : ducks) {
             totalResistance += duck.getResistance();
             totalSpeed += duck.getSpeed();
         }
 
-        return (totalSpeed + totalResistance) / (2.0 * members.size());
+        return (totalSpeed + totalResistance) / (2.0 * ducks.size());
+    }
+
+    public void addDuck(Duck duck) {
+        ducks.add(duck);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Flock{");
+        sb.append("id=").append(super.getId());
+        sb.append(", flockName='").append(flockName).append('\'');
+        sb.append(", flockType='").append(flockType).append('\'');
+        sb.append(", ducks=[");
+        for (int i = 0; i < ducks.size(); i++) {
+            sb.append(ducks.get(i).getUsername());
+            if (i < ducks.size() - 1) {
+                sb.append(", ");
+            }
+        }
+
+        sb.append("]}");
+        return sb.toString();
     }
 }

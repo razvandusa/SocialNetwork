@@ -1,7 +1,9 @@
 package org.example.ui;
 
+import org.example.domain.Flock;
 import org.example.domain.Friendship;
 import org.example.domain.User;
+import org.example.service.FlockService;
 import org.example.service.FriendshipService;
 import org.example.service.UserService;
 
@@ -15,10 +17,12 @@ import java.util.Scanner;
 public class Console {
     private final UserService userService;
     private final FriendshipService friendshipService;
+    private final FlockService flockService;
 
-    public Console(UserService userService, FriendshipService friendshipService) {
+    public Console(UserService userService, FriendshipService friendshipService, FlockService flockService) {
         this.userService = userService;
         this.friendshipService = friendshipService;
+        this.flockService = flockService;
     }
 
     /**
@@ -34,6 +38,10 @@ public class Console {
         System.out.println("6. List Friendships");
         System.out.println("7. Show The Number Of Communities");
         System.out.println("8. Show The Most Sociable Community");
+        System.out.println("9. Add Flock");
+        System.out.println("10. Remove Flock");
+        System.out.println("11. List Flocks");
+        System.out.println("12. Add Duck To Flock");
         System.out.println("0. Exit");
         System.out.println("================");
         System.out.print("Choose an option: ");
@@ -73,6 +81,18 @@ public class Console {
                     break;
                 case "8":
                     showTheMostSociableCommunity();
+                    break;
+                case "9":
+                    addFlock();
+                    break;
+                case "10":
+                    removeFlock();
+                    break;
+                case "11":
+                    listFlocks();
+                    break;
+                case "12":
+                    addDuckToFlock();
                     break;
                 case "0":
                     run = false;
@@ -257,6 +277,62 @@ public class Console {
         for (Long userId : mostSociableCommunity) {
             User user = userService.findById(userId.toString());
             System.out.println(user);
+        }
+    }
+
+    public void addFlock() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the name of the flock: ");
+        String flockName = scanner.nextLine();
+
+        System.out.print("Enter flock type: ");
+        String flockType = scanner.nextLine();
+
+        try {
+            flockService.add(flockName, flockType);
+            System.out.println("Flock added successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void removeFlock() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the ID of the flock you want to remove: ");
+        String flockId = scanner.nextLine();
+
+        try {
+            flockService.remove(flockId);
+            System.out.println("Flock removed successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void listFlocks() {
+        System.out.print("========== All flocks ==========\n");
+        Iterable<Flock> flocks = flockService.findAll();
+        for (Flock flock : flocks) {
+            System.out.println(flock);
+        }
+        System.out.println("===============================");
+    }
+
+    public void addDuckToFlock() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the ID of the flock: ");
+        String flockId = scanner.nextLine();
+
+        System.out.print("Enter the ID of the duck you want to add to the flock: ");
+        String duckId = scanner.nextLine();
+
+        try {
+            flockService.addDuckToFlock(flockId, duckId);
+            System.out.println("Duck added to flock successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 }

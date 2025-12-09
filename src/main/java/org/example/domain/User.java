@@ -20,7 +20,7 @@ public abstract class User extends Entity<Long> {
      * @param password the password of the user
      */
     public User(Long id, String userType, String username, String email, String password) {
-        super.setId(id);
+        super(id);
         this.userType = userType;
         this.username = username;
         this.email = email;

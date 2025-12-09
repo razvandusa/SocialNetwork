@@ -19,7 +19,7 @@ public class Friendship extends Entity<Long> {
      * @param secondFriendId the ID of the second user
      */
     public Friendship(Long id, Long firstFriendId, Long secondFriendId) {
-        super.setId(id);
+        super(id);
         this.firstFriendId = firstFriendId;
         this.secondFriendId = secondFriendId;
     }

@@ -54,11 +54,12 @@ public class UserFileRepository extends AbstractFileRepository<Long, User> {
                     return new FlyingDuck(id, userType, username, email, password, speed, resistance);
                 case FLYING_AND_SWIMMING:
                     return new FlyingSwimmingDuck(id, userType, username, email, password, speed, resistance);
+                default:
+                    throw new IllegalArgumentException("Invalid duck type: " + duckType);
             }
         } else {
             throw new IllegalArgumentException("Invalid user type: " + userType);
         }
-        return null;
     }
 
     /**

@@ -6,7 +6,6 @@ import org.example.exceptions.EntityAlreadyExists;
 import org.example.exceptions.EntityNotFoundException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
 import org.example.repository.Repository;
-import org.example.validation.ValidationStrategy;
 import org.example.validation.ValidatorContext;
 
 import java.util.*;
@@ -52,7 +51,7 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         } else if (userRepository.findById(longIdSecondFriend) == null) {
             throw new EntityNotFoundException("The user with id " + idSecondFriend + " was not found");
         }
-        if (existsFriendship(idFirstFriend, idSecondFriend)) {
+        if (exists(idFirstFriend, idSecondFriend)) {
             throw new EntityAlreadyExists("The friendship between " + idFirstFriend + " and " + idSecondFriend + " already exists");
         }
         repository.add(new Friendship(generateID(), longIdFirstFriend, longIdSecondFriend));
@@ -103,7 +102,7 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
      * @return true if the friendship exists, false otherwise
      * @throws IdValidationException if any id is not a valid number
      */
-    public boolean existsFriendship(String idFirstFriend, String idSecondFriend) {
+    public boolean exists(String idFirstFriend, String idSecondFriend) {
         long longIdFirstFriend;
         long longIdSecondFriend;
         try {

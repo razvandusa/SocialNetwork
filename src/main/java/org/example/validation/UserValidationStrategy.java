@@ -6,7 +6,7 @@ import org.example.domain.User;
 import org.example.exceptions.validationExceptions.duckExceptions.ResistanceValidationException;
 import org.example.exceptions.validationExceptions.duckExceptions.SpeedValidationException;
 import org.example.exceptions.validationExceptions.personExceptions.BirthdateValidationException;
-import org.example.exceptions.validationExceptions.personExceptions.NameException;
+import org.example.exceptions.NameException;
 import org.example.exceptions.validationExceptions.personExceptions.SurnameException;
 import org.example.exceptions.validationExceptions.userExceptions.EmailValidationException;
 import org.example.exceptions.validationExceptions.userExceptions.PasswordValidationException;

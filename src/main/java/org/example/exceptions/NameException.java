@@ -1,4 +1,4 @@
-package org.example.exceptions.validationExceptions.personExceptions;
+package org.example.exceptions;
 
 import org.example.exceptions.validationExceptions.ValidationException;
 
