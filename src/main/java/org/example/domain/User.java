@@ -45,4 +45,11 @@ public abstract class User extends Entity<Long> {
                 ", email='" + email + '\'';
     }
 
+    public void onNotification(String message) {
+        System.out.println(
+                "User[id=" + getId() +
+                        ", username='" + username + "'] received notification: " + message
+        );
+    }
+
 }
