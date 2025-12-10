@@ -13,8 +13,9 @@ public class FlockFileRepository extends AbstractFileRepository<Long, Flock> {
      *
      * @param fileName the file name where entities will be loaded from and saved to
      */
-    public FlockFileRepository(String fileName) {
+    public FlockFileRepository(String fileName, Repository<Long, User> userRepository) {
         super(fileName);
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -23,11 +24,12 @@ public class FlockFileRepository extends AbstractFileRepository<Long, Flock> {
         String flockName = data.get(1);
         String flockType = data.get(2);
         String[] duckIDs = new String[0];
+        Flock flock = new Flock(id, flockName, flockType);
+
         if (data.size() > 3 && !data.get(3).isEmpty()) {
             duckIDs = data.get(3).split(",");
         }
 
-        Flock flock = new Flock(id, flockName, flockType);
         for (String duckID : duckIDs) {
             Duck duck = (Duck) userRepository.findById(Long.parseLong(duckID));
             flock.addDuck(duck);

@@ -3,35 +3,33 @@ package org.example.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Event extends Entity<Long> {
+public abstract class Event extends Entity<Long> implements Subject {
 
     private String eventName;
-    private List<User> subscribers;
+    private List<Observer> subscribers = new ArrayList<>();
 
     Event(Long id, String eventName) {
         super(id);
         this.eventName = eventName;
-        this.subscribers = new ArrayList<>();
     }
 
     public String getEventName() { return eventName; }
     public void setEventName(String eventName) { this.eventName = eventName; }
 
-    public void subscribe(User user) {
-        this.subscribers.add(user);
+    @Override
+    public void subscribe(Observer observer) {
+        this.subscribers.add(observer);
     }
 
-    public void unsubscribe(User user) {
-        this.subscribers.remove(user);
+    public void unsubscribe(Observer observer) {
+        this.subscribers.remove(observer);
     }
 
-    protected void notifySubscribers(String message) {
-        for (User user : subscribers) {
-            user.onNotification(message);
+    public void notifySubscribers(String message) {
+        for (Observer observer : subscribers) {
+            observer.onNotification(message);
         }
     }
 
-    public List<User> getSubscribers() { return subscribers; }
-
-    public abstract void start();
+    public List<Observer> getSubscribers() { return subscribers; }
 }

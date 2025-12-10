@@ -5,31 +5,24 @@ import java.util.List;
 
 public class RaceEvent extends Event {
 
-    private final int maxParticipants;
-    private final List<Swimmer> participants;
+    private List<Swimmer> participants = new ArrayList<>(); // N ducks
+    private List<Double> lanes = new ArrayList<>(); // M distances
 
-    RaceEvent(Long id, String eventName, int  maxParticipants) {
+    public RaceEvent(Long id, String eventName) {
         super(id, eventName);
-        this.maxParticipants = maxParticipants;
-        this.participants = new ArrayList<>();
     }
 
-    public void selectFromFlock(Flock flock) {
-        for (Duck duck : flock.getDucks()) {
-            if (duck instanceof Swimmer) {
-                participants.add((Swimmer) duck);
-                if (participants.size() == maxParticipants) {
-                    break;
-                }
-            }
-        }
+    public List<Swimmer> getParticipants() { return participants; }
+    public List<Double> getLanes() { return lanes; }
+
+    public void setParticipants(List<Swimmer> participants) { this.participants = participants; };
+    public void setLanes(List<Double> lanes) { this.lanes = lanes; }
+
+    public void addParticipant(Swimmer participant) {
+        participants.add(participant);
     }
 
-    @Override
-    public void start() {
-        notifySubscribers("Race Event " + getEventName() + " started with " + participants.size() + " participants!");
-        for (Swimmer duck : participants) {
-            duck.swim();
-        }
+    public void addLane(Double lane) {
+        lanes.add(lane);
     }
 }

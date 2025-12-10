@@ -21,7 +21,7 @@ public class Main {
     static void main() {
         Repository<Long, User> userRepository = new UserFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/java/org/example/ui/users.txt");
         Repository<Long, Friendship> friendshipRepository = new FriendshipFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/java/org/example/ui/friendships.txt");
-        Repository<Long, Flock> flockRepository = new FlockFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/java/org/example/ui/flock.txt");
+        Repository<Long, Flock> flockRepository = new FlockFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/java/org/example/ui/flock.txt", userRepository);
 
         ValidatorContext<User> userValidator = new ValidatorContext<>(new UserValidationStrategy());
         ValidatorContext<Friendship> friendshipValidator = new ValidatorContext<>(new FriendshipValidationStrategy());

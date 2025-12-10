@@ -4,7 +4,7 @@ package org.example.domain;
  * Represents a generic user in the social network.
  * Each user has a unique identifier, a username, an email, and a password.
  */
-public abstract class User extends Entity<Long> {
+public abstract class User extends Entity<Long> implements Observer {
     private String userType;
     private String username;
     private String email;
@@ -45,6 +45,7 @@ public abstract class User extends Entity<Long> {
                 ", email='" + email + '\'';
     }
 
+    @Override
     public void onNotification(String message) {
         System.out.println(
                 "User[id=" + getId() +
