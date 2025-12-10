@@ -23,6 +23,8 @@ public class Flock extends Entity<Long> {
     public void setDucks(List<Duck> ducks) { this.ducks = ducks; }
 
     public Double getAveragePerformance() {
+        if (ducks.isEmpty()) return 0.0;
+
         Double totalSpeed = 0.0;
         Double totalResistance = 0.0;
 
