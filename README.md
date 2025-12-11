@@ -1,24 +1,32 @@
-# DuckSocialNetwork – Lab 3
+# DuckSocialNetwork – Lab 4
 
 ---
 
 ## Features
 
-- **Add/Remove User**  
-  Adding and removing users from the network.  
-  User types:
-    - Person – with name, surname, occupation, etc.
-    - Duck – with type (`FLYING`, `SWIMMING`, `FLYING_AND_SWIMMING`), speed, and stamina.
+- **Add/Remove Flock (Cârd)**  
+  Adding and removing flocks of ducks with a common goal (e.g., `SwimMasters`, `SkyFlyers`).  
+  Attributes:
+    - `id` – unique identifier
+    - `numeCârd` – name of the flock
+    - `membri: List<Duck>` – list of ducks  
+      Methods:
+    - `getPerformantaMedie()` – calculates average speed and stamina of members
 
-- **Add/Remove Friend**  
-  Adding and removing friendship relationships between two users.  
-  Friendships are bidirectional.
+- **Add/Remove Event**  
+  Adding and removing events in the network.  
+  Attributes:
+    - `subscribers: List<User>` – users observing the event  
+      Methods:
+    - `subscribe(User u)`
+    - `unsubscribe(User u)`
+    - `notifySubscribers()` (Observer Pattern)
 
-- **Display Number of Communities**  
-  Determining the number of communities (connected components) in the social network graph.
-
-- **Display the Most Sociable Community**  
-  Displaying the community with the longest path (maximum diameter) between users.
+- **RaceEvent**  
+  Special event for swimming ducks.  
+  Features:
+    - Automatically selects `M` ducks according to the “Natație” rules
+    - Notifies subscribed users
 
 ---
 
