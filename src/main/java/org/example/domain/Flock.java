@@ -40,6 +40,10 @@ public class Flock extends Entity<Long> {
         ducks.add(duck);
     }
 
+    public void removeDuck(Duck duck) {
+        ducks.remove(duck);
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -49,7 +53,7 @@ public class Flock extends Entity<Long> {
         sb.append(", flockType='").append(flockType).append('\'');
         sb.append(", ducks=[");
         for (int i = 0; i < ducks.size(); i++) {
-            sb.append(ducks.get(i).getUsername());
+            sb.append(ducks.get(i).getId());
             if (i < ducks.size() - 1) {
                 sb.append(", ");
             }

@@ -14,10 +14,18 @@ public class FlockFileRepository extends AbstractFileRepository<Long, Flock> {
      * @param fileName the file name where entities will be loaded from and saved to
      */
     public FlockFileRepository(String fileName, Repository<Long, User> userRepository) {
-        super(fileName);
         this.userRepository = userRepository;
+        super(fileName);
     }
 
+    /**
+     * Creates a {@link Flock} entity from a list of string attributes
+     * read from a file line.
+     *
+     * @param data list of string fields from the file
+     * @return the reconstructed Flock
+     * @throws IllegalArgumentException if the flock type is unsupported
+     */
     @Override
     public Flock extractEntity(List<String> data) {
         Long id = Long.parseLong(data.get(0));
@@ -38,6 +46,12 @@ public class FlockFileRepository extends AbstractFileRepository<Long, Flock> {
         return flock;
     }
 
+    /**
+     * Converts a {@link Flock} entity into a string suitable for storing in a file.
+     *
+     * @param entity the {@link Flock} entity to convert
+     * @return the string representation of the flock for file storage
+     */
     @Override
     protected String createEntityAsString(Flock entity) {
         StringBuilder stringBuilder;
@@ -51,5 +65,10 @@ public class FlockFileRepository extends AbstractFileRepository<Long, Flock> {
         }
 
         return stringBuilder.toString();
+    }
+
+    /** Saves all flocks to the file. */
+    public void save() {
+        writeToFile();
     }
 }

@@ -8,3 +8,8 @@
 8;Duck;wingy;wingy@gmail.com;wing1234;FLYING_AND_SWIMMING;28;45
 9;Duck;flappy;flappy@yahoo.com;flap9876;FLYING;35;55
 10;Duck;ducky77;ducky@mail.com;duckPass9;SWIMMING;22;30
+11;Duck;bubbles;bubble@mail.com;quack123;SWIMMING;4;2
+12;Duck;splashy;splash@mail.com;spl@sh2;SWIMMING;5;2
+13;Duck;finsy;fins@mail.com;fin5!;SWIMMING;5;5
+14;Duck;wavey;wave@mail.com;w@ve4;SWIMMING;3;5
+15;Duck;ripple;ripple@mail.com;rippl3;SWIMMING;2;7

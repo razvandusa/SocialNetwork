@@ -46,7 +46,7 @@ public class FriendshipFileRepository extends AbstractFileRepository<Long, Frien
      * Converts a {@link Friendship} entity into a string suitable for storing in a file.
      *
      * @param entity the {@link Friendship} entity to convert
-     * @return the string representation of the user for file storage
+     * @return the string representation of the friendship for file storage
      */
     @Override
     protected String createEntityAsString(Friendship entity) {

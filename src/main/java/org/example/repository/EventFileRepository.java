@@ -5,6 +5,12 @@ import org.example.domain.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A file-based repository for {@link Event} entities.
+ * This repository loads and saves events to a file and reconstructs relationships
+ * with {@link User} entities using the provided {@link User} repository.
+ * It supports different event types; currently, {@link RaceEvent} is handled explicitly.
+ */
 public class EventFileRepository extends AbstractFileRepository<Long, Event> {
 
     Repository<Long, User> userRepository;
@@ -14,23 +20,31 @@ public class EventFileRepository extends AbstractFileRepository<Long, Event> {
      *
      * @param fileName the file name where entities will be loaded from and saved to
      */
-    EventFileRepository(String fileName, Repository<Long, User> userRepository) {
-        super(fileName);
+    public EventFileRepository(String fileName, Repository<Long, User> userRepository) {
         this.userRepository = userRepository;
+        super(fileName);
     }
 
+    /**
+     * Creates a {@link Event} entity from a list of string attributes
+     * read from a file line.
+     *
+     * @param data list of string fields from the file
+     * @return the reconstructed Event
+     * @throws IllegalArgumentException if the event type is unsupported
+     */
     @Override
     public Event extractEntity(List<String> data) {
         Long id = Long.parseLong(data.get(0));
-        String raceType = data.get(1);
+        String eventType = data.get(1);
         String eventName = data.get(2);
 
-        switch (raceType) {
+        switch (eventType) {
             case "RaceEvent":
                 String[] subscribersIDs = new String[0];
                 String[] participantsIDs = new String[0];
                 String[] lanesDistances = new String[0];
-                RaceEvent raceEvent = new RaceEvent(id, eventName);
+                RaceEvent raceEvent = new RaceEvent(id, eventType, eventName);
 
                 if (data.size() > 3 && !data.get(3).isEmpty()) {
                     subscribersIDs = data.get(3).split(",");
@@ -62,16 +76,22 @@ public class EventFileRepository extends AbstractFileRepository<Long, Event> {
                 }
                 return raceEvent;
             default:
-                throw new IllegalArgumentException("Invalid event type: " + raceType);
+                throw new IllegalArgumentException("Invalid event type: " + eventType);
         }
     }
 
+    /**
+     * Converts a {@link Event} entity into a string suitable for storing in a file.
+     *
+     * @param entity the {@link Event} entity to convert
+     * @return the string representation of the event for file storage
+     */
     @Override
     protected String createEntityAsString(Event entity) {
         StringBuilder sb = new StringBuilder();
-        if (entity instanceof RaceEvent) {
+        if (entity.getEventType().equals("RaceEvent")) {
             sb.append(entity.getId()).append(";");
-            sb.append(entity.getClass().getSimpleName()).append(";");
+            sb.append(entity.getEventType()).append(";");
             sb.append(entity.getEventName()).append(";");
 
             List<Observer> subs = entity.getSubscribers();
@@ -99,5 +119,10 @@ public class EventFileRepository extends AbstractFileRepository<Long, Event> {
         } else {
             throw new IllegalArgumentException("Invalid event type: " + entity.getClass().getSimpleName());
         }
+    }
+
+    /** Saves all events to the file. */
+    public void save() {
+        writeToFile();
     }
 }

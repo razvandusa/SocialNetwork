@@ -1,8 +1,7 @@
 package org.example.ui;
 
-import org.example.domain.Flock;
-import org.example.domain.Friendship;
-import org.example.domain.User;
+import org.example.domain.*;
+import org.example.service.EventService;
 import org.example.service.FlockService;
 import org.example.service.FriendshipService;
 import org.example.service.UserService;
@@ -18,11 +17,22 @@ public class Console {
     private final UserService userService;
     private final FriendshipService friendshipService;
     private final FlockService flockService;
+    private final EventService eventService;
 
-    public Console(UserService userService, FriendshipService friendshipService, FlockService flockService) {
+    private static Console instance;
+
+    private Console(UserService userService, FriendshipService friendshipService, FlockService flockService, EventService eventService) {
         this.userService = userService;
         this.friendshipService = friendshipService;
         this.flockService = flockService;
+        this.eventService = eventService;
+    }
+
+    public static Console getInstance(UserService userService, FriendshipService friendshipService, FlockService flockService, EventService eventService) {
+        if (instance == null) {
+            instance = new Console(userService, friendshipService, flockService, eventService);
+        }
+        return instance;
     }
 
     /**
@@ -38,12 +48,46 @@ public class Console {
         System.out.println("6. List Friendships");
         System.out.println("7. Show The Number Of Communities");
         System.out.println("8. Show The Most Sociable Community");
-        System.out.println("9. Add Flock");
-        System.out.println("10. Remove Flock");
-        System.out.println("11. List Flocks");
-        System.out.println("12. Add Duck To Flock");
+        System.out.println("9. Flock Menu");
+        System.out.println("10. Event Menu");
         System.out.println("0. Exit");
         System.out.println("================");
+        System.out.print("Choose an option: ");
+    }
+
+    /**
+     * Displays the flock menu options to the console.
+     */
+    public void flockMenu() {
+        System.out.println("===== FLOCK MENU =====");
+        System.out.println("1. Add Flock");
+        System.out.println("2. Remove Flock");
+        System.out.println("3. List Flocks");
+        System.out.println("4. Add Duck To Flock");
+        System.out.println("5. Remove Duck From Flock");
+        System.out.println("0. Back to Main Menu");
+        System.out.println("====================");
+        System.out.print("Choose an option: ");
+    }
+
+    /**
+     * Displays the event menu options to the console.
+     */
+    public void eventMenu() {
+        System.out.println("===== EVENT MENU =====");
+        System.out.println("1. Add Event");
+        System.out.println("2. Remove Event");
+        System.out.println("3. List Events");
+        System.out.println("4. Start Race");
+        System.out.println("5. Add Spectator To Event");
+        System.out.println("6. Remove Spectator From Event");
+        System.out.println("7. Add Participant To RaceEvent");
+        System.out.println("8. Remove Participant From RaceEvent");
+        System.out.println("9. Add Lane To RaceEvent");
+        System.out.println("10. Remove Lane From RaceEvent");
+        System.out.println("11. Show Lanes");
+        System.out.println("0. Back to Main Menu");
+        System.out.println("====================");
         System.out.print("Choose an option: ");
     }
 
@@ -83,16 +127,76 @@ public class Console {
                     showTheMostSociableCommunity();
                     break;
                 case "9":
-                    addFlock();
+                    boolean flockMenuRun = true;
+                    Scanner flockScanner = new Scanner(System.in);
+                    while (flockMenuRun) {
+                        flockMenu();
+                        String eventChoice = flockScanner.nextLine();
+                        switch (eventChoice) {
+                            case "1":
+                                addFlock();
+                                break;
+                            case "2":
+                                removeFlock();
+                                break;
+                            case "3":
+                                listFlocks();
+                                break;
+                            case "4":
+                                addDuckToFlock();
+                                break;
+                            case "5":
+                                removeDuckFromFlock();
+                                break;
+                            case "0":
+                                flockMenuRun = false;
+                        }
+                    }
                     break;
                 case "10":
-                    removeFlock();
-                    break;
-                case "11":
-                    listFlocks();
-                    break;
-                case "12":
-                    addDuckToFlock();
+                    boolean eventMenuRun = true;
+                    Scanner eventScanner = new Scanner(System.in);
+                    while (eventMenuRun) {
+                        eventMenu();
+                        String eventChoice = eventScanner.nextLine();
+                        switch (eventChoice) {
+                            case "1":
+                                addEvent();
+                                break;
+                            case "2":
+                                removeEvent();
+                                break;
+                            case "3":
+                                listEvents();
+                                break;
+                            case "4":
+                                startEvent();
+                                break;
+                            case "5":
+                                addSpectatorToEvent();
+                                break;
+                            case "6":
+                                removeSpectatorFromEvent();
+                                break;
+                            case "7":
+                                addParticipantToEvent();
+                                break;
+                            case "8":
+                                removeParticipantFromEvent();
+                                break;
+                            case "9":
+                                addLaneToEvent();
+                                break;
+                            case "10":
+                                removeLaneFromEvent();
+                                break;
+                            case "11":
+                                showLaneDetails();
+                                break;
+                            case "0":
+                                eventMenuRun = false;
+                        }
+                    }
                     break;
                 case "0":
                     run = false;
@@ -184,6 +288,8 @@ public class Console {
         try {
             userService.remove(id);
             friendshipService.removeAllFriendshipsOfUser(id);
+            flockService.removeDuckFromAllFlocks(id);
+            eventService.removeUserFromAllEvents(id);
             System.out.println("User removed successfully!");
         } catch (Exception e) {
             System.out.println(e.getMessage());
@@ -280,6 +386,9 @@ public class Console {
         }
     }
 
+    /**
+     * Adds a new flock with the given name and type.
+     */
     public void addFlock() {
         Scanner scanner = new Scanner(System.in);
 
@@ -297,6 +406,9 @@ public class Console {
         }
     }
 
+    /**
+     * Removes a flock by ID.
+     */
     public void removeFlock() {
         Scanner scanner = new Scanner(System.in);
 
@@ -311,6 +423,9 @@ public class Console {
         }
     }
 
+    /**
+     * Lists all flocks in the system.
+     */
     public void listFlocks() {
         System.out.print("========== All flocks ==========\n");
         Iterable<Flock> flocks = flockService.findAll();
@@ -320,6 +435,9 @@ public class Console {
         System.out.println("===============================");
     }
 
+    /**
+     * Adds a duck to a specified flock.
+     */
     public void addDuckToFlock() {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter the ID of the flock: ");
@@ -331,6 +449,226 @@ public class Console {
         try {
             flockService.addDuckToFlock(flockId, duckId);
             System.out.println("Duck added to flock successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Removes a duck from a specified flock.
+     */
+    public void removeDuckFromFlock() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the ID of the flock: ");
+        String flockId = scanner.nextLine();
+
+        System.out.print("Enter the ID of the duck you want to remove: ");
+        String duckId = scanner.nextLine();
+
+        try {
+            flockService.removeDuckFromFlock(flockId, duckId);
+            System.out.println("Duck removed from flock successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Adds a new event with type and name.
+     */
+    public void addEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event type: ");
+        String type = scanner.nextLine();
+        System.out.print("Enter event name: ");
+        String name = scanner.nextLine();
+        try {
+            eventService.add(type, name);
+            System.out.println("Event added successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Removes an event by ID.
+     */
+    public void removeEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String id = scanner.nextLine();
+        try {
+            eventService.remove(id);
+            System.out.println("Event removed successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Lists all events.
+     */
+    public void listEvents() {
+        System.out.print("========== All events ==========\n");
+        Iterable<Event> events = eventService.findAll();
+        for (Event event : events) {
+            System.out.println(event);
+        }
+        System.out.println("==============================");
+    }
+
+    /**
+     * Starts a race event and displays results.
+     */
+    public void startEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String id = scanner.nextLine();
+        try {
+            List<DuckResult> results = eventService.start(id);
+
+            double total = 0;
+
+            System.out.println("=== Race Results ===");
+            for (int i = 0; i < results.size(); i++) {
+                DuckResult dr = results.get(i);
+                System.out.println(
+                        "Duck " + dr.getDuck().getId() +
+                                " on lane " + (i + 1) +
+                                ": t = " + String.format("%.3f", dr.getTime()) + " s"
+                );
+
+                total = Math.max(total, dr.getTime());
+            }
+
+            System.out.println("Total race duration = " +
+                    String.format("%.3f", total) + " s");
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Adds a spectator to a specified event.
+     */
+    public void addSpectatorToEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String eventId = scanner.nextLine();
+        System.out.print("Enter user ID: ");
+        String userId = scanner.nextLine();
+        try {
+            eventService.addSpectatorToEvent(eventId, userId);
+            System.out.println("Spectator added successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Removes a spectator from a specified event.
+     */
+    public void removeSpectatorFromEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String eventId = scanner.nextLine();
+        System.out.print("Enter user ID: ");
+        String userId = scanner.nextLine();
+        try {
+            eventService.removeSpectatorFromEvent(eventId, userId);
+            System.out.println("Spectator removed successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Adds a participant (duck) to a race event.
+     */
+    public void addParticipantToEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String eventId = scanner.nextLine();
+        System.out.print("Enter user ID: ");
+        String userId = scanner.nextLine();
+        try {
+            eventService.addParticipantsToEvent(eventId, userId);
+            System.out.println("Participant added successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Removes a participant from a race event.
+     */
+    public void removeParticipantFromEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String eventId = scanner.nextLine();
+        System.out.print("Enter user ID: ");
+        String userId = scanner.nextLine();
+        try {
+            eventService.removeParticipantsFromEvent(eventId, userId);
+            System.out.println("Participant removed successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Adds a lane to a race event.
+     */
+    public void addLaneToEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String eventId = scanner.nextLine();
+        System.out.print("Enter lane distance: ");
+        String laneValue = scanner.nextLine();
+        try {
+            eventService.addLaneToRaceEvent(eventId, laneValue);
+            System.out.println("Lane added successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Removes a lane from a race event.
+     */
+    public void removeLaneFromEvent() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String eventId = scanner.nextLine();
+        System.out.print("Enter lane index: ");
+        String indexValue = scanner.nextLine();
+        try {
+            eventService.removeLaneFromRaceEvent(eventId, indexValue);
+            System.out.println("Lane removed successfully!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Displays the details of lanes associated with a specific race event.
+     */
+    public void showLaneDetails() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter event ID: ");
+        String eventId = scanner.nextLine();
+        try {
+            List<Double> lanes = eventService.getLanes(eventId);
+            if (lanes.isEmpty()) {
+                System.out.println("No lanes added yet");
+            } else {
+                RaceEvent race = (RaceEvent) eventService.findById(eventId);
+                System.out.println("Lanes for event " + race.getEventName() + ":");
+                for (int i = 0; i < lanes.size(); i++) {
+                    System.out.println("Lane " + (i + 1) + ": " + lanes.get(i) + " meters");
+                }
+            }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

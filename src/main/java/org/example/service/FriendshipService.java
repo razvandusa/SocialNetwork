@@ -218,6 +218,16 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         return mostSociableCommunity;
     }
 
+    /**
+     * Performs a depth-first search (DFS) traversal on the given graph,
+     * collecting all nodes that belong to the same connected component
+     * as the specified starting node.
+     *
+     * @param nodeId the ID of the starting node for the DFS traversal
+     * @param graph the adjacency list representation of the graph
+     * @param visited a set of nodes that have already been visited
+     * @param component a list to collect the nodes in the connected component
+     */
     private void dfsCollect(Long nodeId, Map<Long, List<Long>> graph, Set<Long> visited, List<Long> component) {
         visited.add(nodeId);
         component.add(nodeId);
@@ -228,6 +238,15 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         }
     }
 
+    /**
+     * Performs a breadth-first search (BFS) traversal starting from a given node to find the farthest node
+     * within a connected component of a graph.
+     *
+     * @param start the starting node for the BFS traversal
+     * @param graph the adjacency list representation of the graph
+     * @param component a list of nodes that belong to the connected component
+     * @return the node that is farthest from the starting node within the specified component
+     */
     private Long bfsFarthestNode(Long start, Map<Long, List<Long>> graph, List<Long> component) {
         Queue<Long> queue = new LinkedList<>();
         Set<Long> visited = new HashSet<>();
@@ -248,6 +267,15 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         return farthest;
     }
 
+    /**
+     * Performs a breadth-first search (BFS) to compute the maximum distance from the starting node
+     * to any other node within the same connected component of a graph.
+     *
+     * @param start the starting node for the BFS traversal
+     * @param graph the adjacency list representation of the graph
+     * @param component the list of nodes that belong to the connected component
+     * @return the maximum distance to any node within the specified component
+     */
     private int bfsMaxDistance(Long start, Map<Long, List<Long>> graph, List<Long> component) {
         Queue<Long> queue = new LinkedList<>();
         Map<Long, Integer> distance = new HashMap<>();
@@ -271,6 +299,14 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         return maxDistance;
     }
 
+    /**
+     * Calculates the diameter of a connected component in a graph. The diameter is defined as the
+     * longest shortest path between any two nodes in the component.
+     *
+     * @param component the list of node IDs that belong to the connected component
+     * @param graph the adjacency list representation of the graph
+     * @return the diameter of the connected component
+     */
     private int getCommunityDiameter(List<Long> component, Map<Long, List<Long>> graph) {
         if (component.isEmpty()) return 0;
         Long start = component.getFirst();
