@@ -1,0 +1,4 @@
+1;SplashSquad;Swimmer;10,8,15
+2;WaveRiders;Swimmer;11
+3;SwimStars;Swimmer;13,15
+4;SkyQuacks;Flyer;6,8
