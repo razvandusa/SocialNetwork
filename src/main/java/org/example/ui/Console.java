@@ -657,14 +657,14 @@ public class Console {
         System.out.print("Enter event ID: ");
         String eventId = scanner.nextLine();
         try {
-            List<Double> lanes = eventService.getLanes(eventId);
+            List<Lane> lanes = eventService.getLanes(eventId);
             if (lanes.isEmpty()) {
                 System.out.println("No lanes added yet");
             } else {
                 RaceEvent race = (RaceEvent) eventService.findById(eventId);
                 System.out.println("Lanes for event " + race.getEventName() + ":");
-                for (int i = 0; i < lanes.size(); i++) {
-                    System.out.println("Lane " + (i + 1) + ": " + lanes.get(i) + " meters");
+                for (Lane lane : lanes) {
+                    System.out.println(lane);
                 }
             }
         } catch (Exception e) {

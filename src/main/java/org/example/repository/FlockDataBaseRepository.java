@@ -80,14 +80,11 @@ public class FlockDataBaseRepository implements Repository<Long, Flock>{
                     Double speed = rs.getDouble("speed");
                     Double resistance = rs.getDouble("resistance");
                     if (duckType.equals("SWIMMING")) {
-                        SwimmingDuck duck = new SwimmingDuck(duckId, userType, username, email, password, speed, resistance);
-                        flock.addDuck(duck);
+                        flock.addDuck(new SwimmingDuck(duckId, userType, username, email, password, speed, resistance));
                     } else if (duckType.equals("FLYING")) {
-                        FlyingDuck duck = new FlyingDuck(duckId, userType, username, email, password, speed, resistance);
-                        flock.addDuck(duck);
+                        flock.addDuck(new FlyingDuck(duckId, userType, username, email, password, speed, resistance));
                     } else if (duckType.equals("FLYING_AND_SWIMMING")) {
-                        FlyingSwimmingDuck duck = new FlyingSwimmingDuck(duckId, userType, username, email, password, speed, resistance);
-                        flock.addDuck(duck);
+                        flock.addDuck(new FlyingSwimmingDuck(duckId, userType, username, email, password, speed, resistance));
                     }
                 }
                 return flock;

@@ -6,6 +6,7 @@ import org.example.exceptions.validationExceptions.eventExceptions.EventAlreadyE
 import org.example.exceptions.validationExceptions.eventExceptions.NotEnoughLanesException;
 import org.example.exceptions.validationExceptions.eventExceptions.NotEnoughParticipantsException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
+import org.example.repository.EventDataBaseRepository;
 import org.example.repository.EventFileRepository;
 import org.example.repository.Repository;
 import org.example.validation.ValidatorContext;
@@ -152,8 +153,7 @@ public class EventService extends AbstractService<Long, Event> {
             );
         }
 
-        event.subscribe(user);
-        ((EventFileRepository) repository).save();
+        ((EventDataBaseRepository) repository).addSpectatorToEvent(longEventId, longUserId);
     }
 
     /**
@@ -196,8 +196,7 @@ public class EventService extends AbstractService<Long, Event> {
             );
         }
 
-        event.unsubscribe(user);
-        ((EventFileRepository) repository).save();
+        ((EventDataBaseRepository) repository).removeSpectatorFromEvent(longEventId, longUserId);
     }
 
     /**
@@ -264,8 +263,7 @@ public class EventService extends AbstractService<Long, Event> {
             );
         }
 
-        raceEvent.addParticipant((Swimmer) duck);
-        ((EventFileRepository) repository).save();
+        ((EventDataBaseRepository) repository).addParticipantToEvent(longEventId, longUserId);
     }
 
     /**
@@ -327,8 +325,7 @@ public class EventService extends AbstractService<Long, Event> {
             );
         }
 
-        raceEvent.removeParticipant((Swimmer) duck);
-        ((EventFileRepository) repository).save();
+        ((EventDataBaseRepository) repository).removeParticipantFromEvent(longEventId, longDuckId);
     }
 
     /**
@@ -363,9 +360,9 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IllegalArgumentException("The event is not a RaceEvent");
         }
 
-        double lane;
+        double doubleLaneValue;
         try {
-            lane = Double.parseDouble(laneValue);
+            doubleLaneValue = Double.parseDouble(laneValue);
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Lane must be a number");
         }
@@ -373,12 +370,11 @@ public class EventService extends AbstractService<Long, Event> {
         RaceEvent raceEvent = (RaceEvent) event;
 
         List<Double> existingLanes = raceEvent.getLanes();
-        if (!existingLanes.isEmpty() && lane <= existingLanes.getLast()) {
+        if (!existingLanes.isEmpty() && doubleLaneValue <= existingLanes.getLast()) {
             throw new IllegalArgumentException("Lane distance must be greater than the previous lane distance");
         }
 
-        raceEvent.addLane(lane);
-        ((EventFileRepository) repository).save();
+        ((EventDataBaseRepository) repository).addLaneToEvent(longEventId, doubleLaneValue);
     }
 
     /**
@@ -410,10 +406,10 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IllegalArgumentException("The event is not a RaceEvent");
         }
 
-        int index;
+        Long intIndexValue;
         try {
-            index = Integer.parseInt(indexValue);
-            index--;
+            intIndexValue = Long.parseLong(indexValue);
+            intIndexValue--;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Index must be a number");
         }
@@ -424,12 +420,11 @@ public class EventService extends AbstractService<Long, Event> {
         if (lanes.isEmpty()) {
             throw new IllegalArgumentException("There are no lanes to remove");
         }
-        if (index < 0 || index > lanes.size() - 1) {
-            throw new IndexOutOfBoundsException("Invalid lane index: " + index);
+        if (intIndexValue < 0 || intIndexValue > lanes.size() - 1) {
+            throw new IndexOutOfBoundsException("Invalid lane index: " + intIndexValue);
         }
 
-        lanes.remove(index);
-        ((EventFileRepository) repository).save();
+        ((EventDataBaseRepository) repository).removeLaneFromEvent(longEventId, intIndexValue);
     }
 
     /**
@@ -441,7 +436,7 @@ public class EventService extends AbstractService<Long, Event> {
      * @throws EntityNotFoundException if no event is found with the provided ID
      * @throws IllegalArgumentException if the event associated with the ID is not a RaceEvent
      */
-    public List<Double> getLanes(String eventId) {
+    public List<Lane> getLanes(String eventId) {
         long longEventId;
         try {
             longEventId = Long.parseLong(eventId);
@@ -458,8 +453,7 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IllegalArgumentException("The event is not a RaceEvent");
         }
 
-        RaceEvent race = (RaceEvent) event;
-        List<Double> lanes = race.getLanes();
+        List<Lane> lanes = ((EventDataBaseRepository) repository).getLanes(longEventId);
         return lanes;
     }
 
