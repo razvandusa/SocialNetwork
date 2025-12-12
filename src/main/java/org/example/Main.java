@@ -27,7 +27,7 @@ public class Main {
 
         Repository<Long, User> userRepository = new UserDataBaseRepository(url, user, password);
         Repository<Long, Friendship> friendshipRepository = new FriendshipDataBaseRepository(url, user, password);
-        Repository<Long, Flock> flockRepository = new FlockFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/resources/flocks.txt", userRepository);
+        Repository<Long, Flock> flockRepository = new FlockDataBaseRepository(url, user, password);
         Repository<Long, Event> eventRepository = new EventFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/resources/events.txt", userRepository);
 
         ValidatorContext<User> userValidator = new ValidatorContext<>(new UserValidationStrategy());

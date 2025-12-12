@@ -3,6 +3,7 @@ package org.example.service;
 import org.example.domain.*;
 import org.example.exceptions.EntityNotFoundException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
+import org.example.repository.FlockDataBaseRepository;
 import org.example.repository.FlockFileRepository;
 import org.example.repository.Repository;
 import org.example.validation.ValidatorContext;
@@ -150,8 +151,7 @@ public class FlockService extends AbstractService<Long, Flock>{
             );
         }
 
-        flock.addDuck(duck);
-        ((FlockFileRepository) repository).save();
+        ((FlockDataBaseRepository) repository).addDuckToFlock(longFlockId, longDuckId);
     }
 
     /**
@@ -203,8 +203,7 @@ public class FlockService extends AbstractService<Long, Flock>{
             throw new IllegalArgumentException("The duck with id " + duckId + " is not a part of this flock");
         }
 
-        flock.removeDuck(duck);
-        ((FlockFileRepository) repository).save();
+        ((FlockDataBaseRepository) repository).removeDuckFromFlock(longFlockId, longDuckId);
     }
 
     /**

@@ -51,7 +51,7 @@ public class FriendshipDataBaseRepository implements Repository<Long, Friendship
             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
+            if (rs.next()) {
                 Long friendshipId = rs.getLong("id");
                 Long firstFriendId = rs.getLong("firstFriendId");
                 Long secondFriendId = rs.getLong("secondFriendId");
@@ -72,9 +72,8 @@ public class FriendshipDataBaseRepository implements Repository<Long, Friendship
             List<Friendship> friendships = new ArrayList<>();
             while (rs.next()) {
                 Long friendshipId = rs.getLong("id");
-                Long firstFriendId = rs.getLong("firstFriendId");
-                Long secondFriendId = rs.getLong("secondFriendId");
-                friendships.add(new Friendship(friendshipId, firstFriendId, secondFriendId));
+                Friendship friendship = findById(friendshipId);
+                friendships.add(friendship);
             }
             return friendships;
         } catch (SQLException e) {

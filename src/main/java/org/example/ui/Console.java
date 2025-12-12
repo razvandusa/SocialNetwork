@@ -287,7 +287,6 @@ public class Console {
 
         try {
             userService.remove(id);
-            flockService.removeDuckFromAllFlocks(id);
             eventService.removeUserFromAllEvents(id);
             System.out.println("User removed successfully!");
         } catch (Exception e) {

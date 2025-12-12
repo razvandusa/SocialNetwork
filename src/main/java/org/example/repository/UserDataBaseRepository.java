@@ -78,7 +78,7 @@ public class UserDataBaseRepository implements Repository<Long, User>{
             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
+            if (rs.next()) {
                 Long userId = rs.getLong("id");
                 String userType = rs.getString("usertype");
                 String username = rs.getString("username");
@@ -117,28 +117,8 @@ public class UserDataBaseRepository implements Repository<Long, User>{
             List<User> users = new ArrayList<>();
             while (rs.next()) {
                 Long userId = rs.getLong("id");
-                String userType = rs.getString("usertype");
-                String username = rs.getString("username");
-                String email = rs.getString("email");
-                String password = rs.getString("password");
-                if (userType.equals("Person")) {
-                    String surname = rs.getString("surname");
-                    String name = rs.getString("name");
-                    LocalDate birthdate = rs.getDate("birthdate").toLocalDate();
-                    String occupation = rs.getString("occupation");
-                    users.add(new Person(userId, userType, username, email, password, surname, name, birthdate, occupation));
-                } else if (userType.equals("Duck")) {
-                    String duckType = rs.getString("duckType");
-                    Double speed = rs.getDouble("speed");
-                    Double resistance = rs.getDouble("resistance");
-                    if (duckType.equals("SWIMMING")) {
-                        users.add(new SwimmingDuck(userId, userType, username, email, password, speed, resistance));
-                    } else if (duckType.equals("FLYING")) {
-                        users.add(new FlyingDuck(userId, userType, username, email, password, speed, resistance));
-                    } else if (duckType.equals("FLYING_AND_SWIMMING")) {
-                        users.add(new FlyingSwimmingDuck(userId, userType, username, email, password, speed, resistance));
-                    }
-                }
+                User user = findById(userId);
+                users.add(user);
             }
             return users;
         } catch (SQLException e) {
