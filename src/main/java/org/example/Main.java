@@ -9,9 +9,23 @@ import org.example.service.UserService;
 import org.example.ui.Console;
 import org.example.validation.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
 public class Main {
     static void main() {
-        Repository<Long, User> userRepository = new UserFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/resources/users.txt");
+        String url = "jdbc:postgresql://localhost:5432/SocialNetwork";
+        String user = "postgres";
+        String password = "1234";
+
+        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+            System.out.println("Connected to the PostgresSQL server successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        Repository<Long, User> userRepository = new UserDataBaseRepository(url, user, password);
         Repository<Long, Friendship> friendshipRepository = new FriendshipFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/resources/friendships.txt");
         Repository<Long, Flock> flockRepository = new FlockFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/resources/flocks.txt", userRepository);
         Repository<Long, Event> eventRepository = new EventFileRepository("/Users/razvandusa/IdeaProjects/SocialNetwork/src/main/resources/events.txt", userRepository);
