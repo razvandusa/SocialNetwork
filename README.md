@@ -1,5 +1,6 @@
-## Data Persistence and Database Integration
+# DuckSocialNetwork – Lab 5
 
+---
 - **Database:** PostgreSQL is used to persist all data in a relational database.  
 - **Tables:**  
   - `users` – stores all user accounts (Person and Duck).  
