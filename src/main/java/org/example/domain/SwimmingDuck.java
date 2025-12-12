@@ -13,7 +13,7 @@ public class SwimmingDuck extends Duck implements Swimmer {
      * @param resistance the resistance of the duck
      */
     public SwimmingDuck(Long id, String userType, String username, String email, String password, Double speed, Double resistance) {
-        super(id, userType, username, email, password, speed, resistance);
+        super(id, userType, username, email, password, "SWIMMING", speed, resistance);
     }
 
     @Override
