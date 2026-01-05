@@ -8,11 +8,14 @@ import org.example.exceptions.validationExceptions.duckExceptions.SpeedValidatio
 import org.example.exceptions.validationExceptions.personExceptions.BirthdateValidationException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
 import org.example.repository.Repository;
+import org.example.repository.UserDataBaseRepository;
 import org.example.validation.ValidationStrategy;
 import org.example.validation.ValidatorContext;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -154,5 +157,54 @@ public class UserService extends AbstractService<Long, User> {
             throw new IdValidationException("The id must be a number");
         }
         return repository.findById(longId);
+    }
+
+    public List<User> findDuckByType(String duckType) {
+        List<User> filtered = new ArrayList<>();
+        List<User> allUsers = (List<User>) repository.findAll();
+
+        switch (duckType) {
+            case "SWIMMING":
+                for (User user : allUsers) {
+                    if (user instanceof Swimmer) {
+                        filtered.add(user);
+                    }
+                }
+                break;
+            case "FLYING":
+                for (User user : allUsers) {
+                    if (user instanceof Flyer) {
+                        filtered.add(user);
+                    }
+                }
+                break;
+            case "FLYING_AND_SWIMMING":
+                for (User user : allUsers) {
+                    if (user instanceof Flyer && user instanceof Swimmer) {
+                        filtered.add(user);
+                    }
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid duck type: " + duckType);
+        }
+
+        return filtered;
+    }
+
+    public List<User> getUsersPage(Long pageNumber, Long pageSize) {
+        return ((UserDataBaseRepository)repository).getUsersPage(pageNumber, pageSize);
+    }
+
+    public Long getUsersCount() {
+        return ((UserDataBaseRepository)repository).getUsersCount();
+    }
+
+    public List<User> getDucksPageByType(String type, Long page, Long pageSize) {
+        return ((UserDataBaseRepository)repository).findDucksPageByType(type, page, pageSize);
+    }
+
+    public long getDucksCountByType(String type) {
+        return ((UserDataBaseRepository)repository).getDucksCountByType(type);
     }
 }

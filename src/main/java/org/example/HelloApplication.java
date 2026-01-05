@@ -48,9 +48,10 @@ public class HelloApplication extends Application {
         EventService eventService = new EventService(eventRepository, userRepository, eventValidator);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
-        Scene scene = new Scene(loader.load(), 360, 640);
+        Scene scene = new Scene(loader.load(), 1360, 740);
         MainWindow controller = loader.getController();
         controller.setUserService(userService);
+        controller.setFriendshipService(friendshipService);
         stage.setTitle("Social Network");
         scene.getStylesheets().add(getClass().getResource("/css/main-window.css").toExternalForm());
         stage.setScene(scene);

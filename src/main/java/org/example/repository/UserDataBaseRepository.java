@@ -126,4 +126,88 @@ public class UserDataBaseRepository implements Repository<Long, User>{
         }
         return null;
     }
+
+    public List<User> getUsersPage(Long pageNumber, Long pageSize) {
+        String sql = "SELECT * FROM users ORDER BY id LIMIT ? OFFSET ?";
+        Long offset = (pageNumber - 1) * pageSize;
+        List<User> users = new ArrayList<>();
+        try(Connection conn = DriverManager.getConnection(url, username, password);
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, pageSize);
+            ps.setLong(2, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Long userId = rs.getLong("id");
+                User user = findById(userId);
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+
+    public Long getUsersCount() {
+        String sql = "SELECT COUNT(*) FROM users";
+        Long count = 0L;
+        try(Connection conn = DriverManager.getConnection(url, username, password);
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+
+    public List<User> findDucksPageByType(String type, Long pageNumber, Long pageSize) {
+        long offset = (pageNumber - 1) * pageSize;
+
+        String sql = """
+                     SELECT * FROM users 
+                     WHERE usertype = 'Duck'
+                     AND (ducktype = ? OR ducktype = 'FLYING_AND_SWIMMING')
+                     ORDER BY id
+                     LIMIT ? OFFSET ?
+                     """;
+        List<User> ducks = new ArrayList<>();
+        try(Connection conn = DriverManager.getConnection(url, username, password);
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, type);
+            ps.setLong(2, pageSize);
+            ps.setLong(3, offset);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Long userId = rs.getLong("id");
+                User user = findById(userId);
+                ducks.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ducks;
+    }
+
+    public Long getDucksCountByType(String type) {
+        String sql = """
+                     SELECT COUNT(*)
+                     FROM users
+                     WHERE usertype = 'Duck'
+                     AND (ducktype = ? OR ducktype = 'FLYING_AND_SWIMMING')
+                     """;
+        Long count = 0L;
+        try(Connection conn = DriverManager.getConnection(url, username, password);
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, type);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                count = rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 }

@@ -1,0 +1,18 @@
+.body {
+    -fx-background-color: rgba(18, 18, 18, 0.85);
+    -fx-padding: 15;
+}
+
+.text-fields-container {
+    -fx-spacing: 20;
+}
+
+.user-fields-label {
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-text-fill: white;
+}
+
+.user-fields-container {
+    -fx-spacing: 3;
+}

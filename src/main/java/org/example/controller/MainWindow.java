@@ -1,28 +1,45 @@
 package org.example.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import org.example.domain.Duck;
-import org.example.domain.Person;
-import org.example.domain.User;
-import org.example.domain.UserRow;
+import javafx.stage.Stage;
+import org.example.domain.*;
+import org.example.service.FriendshipService;
 import org.example.service.UserService;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-public class MainWindow {
+public class MainWindow implements Observer {
 
-    private Label comboBoxLabel;
+    public Label labelPage;
 
     private UserService userService;
 
+    private FriendshipService friendshipService;
+
     private List<UserRow> originalRows;
+
+    private UserManagerWindow userManagerController;
+
+    private FriendshipManagerWindow friendshipManagerController;
+
+    private Long currentPage = 1L;
+
+    private Long pageSize = 5L;
+
+    private Long totalPages;
+
+    private boolean isFiltered = false;
+
+    private String filterType = null;
 
     @FXML
     private ComboBox<String> userTypeComboBox;
@@ -67,6 +84,9 @@ public class MainWindow {
     private TableColumn<UserRow, Double> userResistance;
 
     @FXML
+    private Label comboBoxLabel;
+
+    @FXML
     private void initialize() {
         configureTableColumns();
         configureComboBox();
@@ -94,11 +114,92 @@ public class MainWindow {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
-        loadUsers();}
+        initializePagination();
+        loadPage(1L);}
+
+    public void setFriendshipService(FriendshipService friendshipService) {
+        this.friendshipService = friendshipService;}
 
     private void loadUsers() {
-        List<User> users = (List<User>) userService.findAll();
-        originalRows = users.stream().map(u -> {
+        isFiltered = false;
+        filterType = null;
+        initializePagination();
+        loadPage(1L);
+    }
+
+    private void filterUsers() {
+        String selectedType = userTypeComboBox.getValue();
+
+        if (selectedType == null || selectedType.isEmpty()) {
+            userTable.getItems().setAll(originalRows);
+            return;
+        }
+
+        isFiltered = true;
+        filterType = selectedType;
+        initializePagination();
+        loadPage(1L);
+    }
+
+    public void openUserManagerWindow() throws IOException {
+        Stage stage = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/UserManagerWindow.fxml"));
+        Scene scene = new Scene(loader.load(), 660, 640);
+        this.userManagerController = loader.getController();
+        userManagerController.setUserService(userService);
+        userManagerController.subscribe(this);
+        if (friendshipManagerController != null) {
+            userManagerController.subscribe(friendshipManagerController);
+        }
+        stage.setTitle("Manage Users");
+        scene.getStylesheets().add(getClass().getResource("/css/user-manager-window.css").toExternalForm());
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public void openFriendshipManagerWindow() throws IOException {
+        Stage stage = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/FriendshipManagerWindow.fxml"));
+        Scene scene = new Scene(loader.load(), 860, 640);
+        this.friendshipManagerController = loader.getController();
+        friendshipManagerController.setFriendshipService(friendshipService);
+        if (userManagerController != null) {
+            userManagerController.subscribe(friendshipManagerController);
+        }
+        stage.setTitle("Manage Friendships");
+        scene.getStylesheets().add(getClass().getResource("/css/friendship-manager-window.css").toExternalForm());
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    @Override
+    public void onNotification(String message) {
+        System.out.println(message);
+        loadPage(currentPage);
+    }
+
+    public void initializePagination() {
+        if (isFiltered && filterType != null) {
+            long count = userService.getDucksCountByType(filterType);
+            this.totalPages = (long) Math.ceil(count / (double) pageSize);
+        } else {
+            this.totalPages = (long) Math.ceil(userService.getUsersCount() / (double) pageSize);
+        }
+    }
+
+    public void loadPage(Long pageNumber) {
+        if (pageNumber < 1 || pageNumber > totalPages) {
+            return;
+        }
+        currentPage = pageNumber;
+        labelPage.setText(String.valueOf(currentPage));
+        List<User> users;
+        if (isFiltered && filterType != null) {
+            users = userService.getDucksPageByType(filterType, pageNumber, pageSize);
+        } else {
+            users = userService.getUsersPage(pageNumber, pageSize);
+        }
+        userTable.getItems().setAll(users.stream().map(u -> {
             UserRow r = new UserRow();
             r.setId(u.getId());
             r.setUserType(u.getUserType());
@@ -122,23 +223,20 @@ public class MainWindow {
             }
 
             return r;
-        }).toList();
-
-        userTable.getItems().setAll(originalRows);
+        }).toList());
     }
 
-    private void filterUsers() {
-        String selectedType = userTypeComboBox.getValue();
-
-        if (selectedType == null || selectedType.isEmpty()) {
-            userTable.getItems().setAll(originalRows);
+    public void nextPage() {
+        if (currentPage + 1 > totalPages) {
             return;
         }
+        loadPage(currentPage + 1);
+    }
 
-        List<UserRow> filtered = originalRows.stream()
-                .filter(r -> selectedType.equals(r.getDuckType()))
-                .toList();
-
-        userTable.getItems().setAll(filtered);
+    public void previousPage() {
+        if (currentPage - 1 < 1) {
+            return;
+        }
+        loadPage(currentPage - 1);
     }
 }
