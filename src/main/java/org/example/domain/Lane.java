@@ -4,6 +4,12 @@ public class Lane extends Entity<Long> {
 
     Double distance;
 
+    /**
+     * Constructs a Lane
+     *
+     * @param id the unique identifier for the lane
+     * @param distance the length of the lane
+     */
     public Lane(Long id, Double distance) {
         super(id);
         this.distance = distance;

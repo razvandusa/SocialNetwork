@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 group = 'org.example'
@@ -15,10 +16,17 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation "org.openjfx:javafx-controls:21.0.4"
+    implementation "org.openjfx:javafx-fxml:21.0.4"
 }
 
 test {
     useJUnitPlatform()
 }
 
-application { mainClass = 'org.example.Main' }
+javafx {
+    version = "21.0.4"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+application { mainClass = 'org.example.HelloApplication' }

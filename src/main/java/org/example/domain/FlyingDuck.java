@@ -13,7 +13,7 @@ public class FlyingDuck extends Duck implements Flyer {
      * @param resistance the resistance of the duck
      */
     public FlyingDuck(Long id, String userType, String username, String email, String password, Double speed, Double resistance) {
-        super(id, userType, username, email, password, speed, resistance);
+        super(id, userType, username, email, password, "FLYING", speed, resistance);
     }
 
     @Override

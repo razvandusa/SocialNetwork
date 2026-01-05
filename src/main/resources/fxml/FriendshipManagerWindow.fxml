@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox   styleClass="body"
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.example.controller.FriendshipManagerWindow"
+        prefHeight="400.0" prefWidth="600.0"
+        spacing="15" alignment="TOP_CENTER">
+    <HBox styleClass="text-fields-container">
+        <TableView fx:id="friendshipTable">
+            <columns>
+                <TableColumn fx:id="friendshipId" text="ID" prefWidth="100"/>
+                <TableColumn fx:id="firstFriendId" text="firstFriendId" prefWidth="100"/>
+                <TableColumn fx:id="secondFriendId" text="secondFriendId" prefWidth="100"/>
+            </columns>
+        </TableView>
+        <VBox styleClass="friendship-fields-container">
+            <Label text="FriendshipFields" styleClass="friendship-fields-label"/>
+            <TextField fx:id="fieldFriendshipId" promptText="ID"/>
+            <TextField fx:id="fieldFirstFriendId" promptText="First Friend ID"/>
+            <TextField fx:id="fieldSecondFriendId" promptText="Second Friend ID"/>
+        </VBox>
+    </HBox>
+    <HBox spacing="5">
+        <Button text="Add" onAction="#addFriendship"/>
+        <Button text="Remove" onAction="#removeFriendship"/>
+    </HBox>
+    <Region VBox.vgrow="ALWAYS"/>
+    <HBox spacing="5">
+        <Button text="Show Communities" onAction="#showCommunities"/>
+        <Button text="Most Sociable Community" onAction="#showMostSociableCommunity"/>
+    </HBox>
+</VBox>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox   styleClass="body"
+        xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="org.example.controller.MainWindow"
+            prefHeight="400.0" prefWidth="600.0"
+            spacing="15" alignment="TOP_CENTER">
+            <TableView fx:id="userTable">
+                <columns>
+                    <TableColumn fx:id="userId" text="ID" prefWidth="100"/>
+                    <TableColumn fx:id="userType" text="userType" prefWidth="100"/>
+                    <TableColumn fx:id="userUsername" text="username" prefWidth="100"/>
+                    <TableColumn fx:id="userEmail" text="email" prefWidth="100"/>
+                    <TableColumn fx:id="userPassword" text="password" prefWidth="100"/>
+                    <TableColumn fx:id="userSurname" text="surname" prefWidth="100"/>
+                    <TableColumn fx:id="userName" text="name" prefWidth="100"/>
+                    <TableColumn fx:id="userBirthdate" text="birthdate" prefWidth="100"/>
+                    <TableColumn fx:id="userOccupation" text="occupation" prefWidth="100"/>
+                    <TableColumn fx:id="userDuckType" text="duckType" prefWidth="100"/>
+                    <TableColumn fx:id="userSpeed" text="speed" prefWidth="100"/>
+                    <TableColumn fx:id="userResistance" text="resistance" prefWidth="100"/>
+                </columns>
+            </TableView>
+            <HBox alignment="CENTER" spacing="5">
+                <Button text="Previous" onAction="#previousPage"/>
+                <Label fx:id="labelPage" text="1" style="-fx-text-fill: white; -fx-font-size: 16px;" />
+                <Button text="Next" onAction="#nextPage"/>
+            </HBox>
+            <HBox alignment="CENTER_LEFT">
+                <Label fx:id="comboBoxLabel" text=" Select Duck Type  "/>
+                <ComboBox fx:id="userTypeComboBox" prefWidth="200"/>
+            </HBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <HBox alignment="BOTTOM_LEFT" spacing="5">
+                <Button text="Users" onAction="#openUserManagerWindow"/>
+                <Button text="Friendships" onAction="#openFriendshipManagerWindow"/>
+            </HBox>
+</VBox>

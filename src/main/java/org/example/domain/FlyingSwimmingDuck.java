@@ -13,7 +13,7 @@ public class FlyingSwimmingDuck extends Duck implements Flyer, Swimmer {
      * @param resistance the resistance of the duck
      */
     public FlyingSwimmingDuck(Long id, String userType, String username, String email, String password, Double speed, Double resistance) {
-        super(id, userType, username, email, password, speed, resistance);
+        super(id, userType, username, email, password, "FLYING_AND_SWIMMING", speed, resistance);
     }
 
     @Override

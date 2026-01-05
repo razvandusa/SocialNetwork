@@ -24,9 +24,11 @@ public class Friendship extends Entity<Long> {
         this.secondFriendId = secondFriendId;
     }
 
+    public Long getId() { return super.getId(); }
     public Long getFirstFriendId() { return firstFriendId; }
     public Long getSecondFriendId() { return secondFriendId; }
 
+    public void setId(Long id) { super.setId(id); }
     public void setFirstFriendId(Long id) { this.firstFriendId = id; }
     public void setSecondFriendId(Long id) { this.secondFriendId = id; }
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox   styleClass="body"
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="org.example.controller.UserManagerWindow"
+        prefHeight="400.0" prefWidth="600.0"
+        spacing="15" alignment="TOP_CENTER">
+        <HBox styleClass="text-fields-container">
+            <VBox styleClass="user-fields-container">
+                <Label text = "UserFields" styleClass="user-fields-label"/>
+                <TextField fx:id="fieldUserId" promptText="ID"/>
+                <TextField fx:id="fieldUserType" promptText="User Type"/>
+                <TextField fx:id="fieldUserUsername" promptText="Username"/>
+                <TextField fx:id="fieldUserEmail" promptText="Email"/>
+                <TextField fx:id="fieldUserPassword" promptText="Password"/>
+            </VBox>
+            <VBox styleClass="user-fields-container">
+                <Label text = "PersonFields" styleClass="user-fields-label"/>
+                <TextField fx:id="fieldPersonSurname" promptText="Surname"/>
+                <TextField fx:id="fieldPersonName" promptText="Name"/>
+                <TextField fx:id="fieldPersonBirthdate" promptText="Birthdate"/>
+                <TextField fx:id="fieldPersonOccupation" promptText="Occupation"/>
+            </VBox>
+            <VBox styleClass="user-fields-container">
+                <Label text = "DuckFields" styleClass="user-fields-label"/>
+                <TextField fx:id="fieldDuckType" promptText="Duck Type"/>
+                <TextField fx:id="fieldDuckSpeed" promptText="Speed"/>
+                <TextField fx:id="fieldDuckResistance" promptText="Resistance"/>
+            </VBox>
+        </HBox>
+        <HBox spacing="5">
+            <Button text="Add" onAction="#addUser"/>
+            <Button text="Remove" onAction="#removeUser"/>
+        </HBox>
+</VBox>
