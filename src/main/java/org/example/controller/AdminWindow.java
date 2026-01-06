@@ -27,9 +27,9 @@ public class AdminWindow implements Observer {
 
     private List<UserRow> originalRows;
 
-    private UserManagerWindow userManagerController;
+    private AdminUserWindow userManagerController;
 
-    private FriendshipManagerWindow friendshipManagerController;
+    private AdminFriendshipWindow friendshipManagerController;
 
     private Long currentPage = 1L;
 
@@ -143,7 +143,7 @@ public class AdminWindow implements Observer {
 
     public void openUserManagerWindow() throws IOException {
         Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/UserManagerWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminUserWindow.fxml"));
         Scene scene = new Scene(loader.load(), 660, 640);
         this.userManagerController = loader.getController();
         userManagerController.setUserService(userService);
@@ -159,7 +159,7 @@ public class AdminWindow implements Observer {
 
     public void openFriendshipManagerWindow() throws IOException {
         Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/FriendshipManagerWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminFriendshipWindow.fxml"));
         Scene scene = new Scene(loader.load(), 860, 640);
         this.friendshipManagerController = loader.getController();
         friendshipManagerController.setFriendshipService(friendshipService);

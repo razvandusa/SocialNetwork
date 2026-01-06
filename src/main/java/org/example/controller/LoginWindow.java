@@ -18,7 +18,6 @@ public class LoginWindow {
 
     private UserService userService;
     private FriendshipService friendshipService;
-    Stage stage = new Stage();
 
     @FXML
     private Button loginButton;
@@ -35,11 +34,7 @@ public class LoginWindow {
             try {
                 handleLogin();
             } catch (IOException ex) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText(null);
-                alert.setContentText("The page couldn't be loaded.");
-                alert.showAndWait();
+                showInformationAlert("Error", "The page couldn't be loaded.", ex.getMessage());
             }
         });
     }
@@ -58,15 +53,11 @@ public class LoginWindow {
         String password = passwordField.getText();
 
         if (username.isEmpty() || password.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Login Failed");
-            alert.setHeaderText(null);
             if (username.isEmpty()) {
-                alert.setContentText("Username can't be empty!");
+                showInformationAlert("Login Failed", "Username can't be empty!", "");
             } else {
-                alert.setContentText("Password can't be empty!");
+                showInformationAlert("Login Failed", "Password can't be empty!", "");
             }
-            alert.showAndWait();
             return;
         }
 
@@ -74,22 +65,54 @@ public class LoginWindow {
 
         if (user != null) {
             if (user.getUsername().equals("admin")) {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminWindow.fxml"));
-                Scene scene = new Scene(loader.load(), 1360, 740);
-                AdminWindow controller = loader.getController();
-                controller.setUserService(userService);
-                controller.setFriendshipService(friendshipService);
-                stage.setTitle("Admin Panel");
-                scene.getStylesheets().add(getClass().getResource("/css/admin-window.css").toExternalForm());
-                stage.setScene(scene);
-                stage.show();
+                opneAdminWindow();
+                closeWindow((Stage) loginButton.getScene().getWindow());
+            } else {
+                openUserWindow(user);
+                closeWindow((Stage) loginButton.getScene().getWindow());
             }
         } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Login Failed");
-            alert.setHeaderText(null);
-            alert.setContentText("Invalid username or password.");
-            alert.showAndWait();
+            showInformationAlert("Login Failed", "Invalid username or password.", "");
         }
+    }
+
+    private void showInformationAlert(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void closeWindow(Stage stage) { stage.close(); }
+
+    private void opneAdminWindow() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminWindow.fxml"));
+        Scene scene = new Scene(loader.load(), 1360, 740);
+
+        AdminWindow controller = loader.getController();
+        controller.setUserService(userService);
+        controller.setFriendshipService(friendshipService);
+        scene.getStylesheets().add(getClass().getResource("/css/admin-window.css").toExternalForm());
+
+        Stage stage = new Stage();
+        stage.setTitle("Admin Panel");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    private void openUserWindow(User user) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ProfileWindow.fxml"));
+        Scene scene = new Scene(loader.load(), 360, 640);
+
+        ProfileWindow controller = loader.getController();
+        controller.setFriendshipService(friendshipService);
+        controller.setUser(user);
+        scene.getStylesheets().add(getClass().getResource("/css/profile-window.css").toExternalForm());
+
+        Stage stage = new Stage();
+        stage.setTitle("User Profile");
+        stage.setScene(scene);
+        stage.show();
     }
 }

@@ -48,11 +48,12 @@ public class HelloApplication extends Application {
         EventService eventService = new EventService(eventRepository, userRepository, eventValidator);
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginWindow.fxml"));
-        Scene scene = new Scene(loader.load(), 480, 700);
+        Scene scene = new Scene(loader.load(), 420, 640);
         LoginWindow controller = loader.getController();
         controller.setUserService(userService);
         controller.setFriendshipService(friendshipService);
-        stage.setTitle("LuckyLink");
+
+        stage.setTitle("LuckyLink - Login page");
         scene.getStylesheets().add(getClass().getResource("/css/login-window.css").toExternalForm());
         stage.setScene(scene);
         stage.show();

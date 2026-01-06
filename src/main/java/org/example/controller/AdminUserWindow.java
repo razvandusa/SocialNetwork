@@ -10,7 +10,7 @@ import org.example.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserManagerWindow implements Subject {
+public class AdminUserWindow implements Subject {
 
     private List<Observer> observers = new ArrayList<>();
 

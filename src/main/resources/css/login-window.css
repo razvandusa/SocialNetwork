@@ -1,3 +1,9 @@
+/* Login window */
+.body {
+    -fx-background-color: #197d13;
+}
+
+/* Welcome label */
 .welcome-label {
     -fx-font-size: 36px;
     -fx-font-family: 'Arial';
@@ -6,6 +12,20 @@
     -fx-text-fill: white;
 }
 
+/* Credentials fields (Username and Password)*/
+.credentials-fields {
+    -fx-spacing: 12;
+    -fx-pref-width: 280px;
+    -fx-min-width: 280px;
+    -fx-max-width: 280px;
+
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 14px;
+}
+
+/* Login button */
 .login-button {
     -fx-font-family: 'Arial';
     -fx-font-size: 14px;
@@ -17,16 +37,4 @@
     -fx-background-radius: 8;
     -fx-border-radius: 8;
     -fx-padding: 10 14 10 14;
-}
-
-.credentials-fields {
-    -fx-spacing: 12;
-    -fx-pref-width: 280px;
-    -fx-min-width: 280px;
-    -fx-max-width: 280px;
-
-    -fx-background-radius: 8;
-    -fx-border-radius: 8;
-    -fx-padding: 10 14 10 14;
-    -fx-font-size: 14px;
 }

@@ -8,12 +8,12 @@
 
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.image.Image?>
-<VBox xmlns="http://javafx.com/javafx"
+<VBox styleClass="body"
+      xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.example.controller.LoginWindow"
       spacing="25"
-      alignment="TOP_CENTER"
-      style="-fx-background-color: #197d13;">
+      alignment="TOP_CENTER">
 
     <StackPane prefHeight="150" style="-fx-background-color: #F4F2EF;">
         <ImageView fx:id="logoImage"
@@ -22,7 +22,7 @@
                    preserveRatio="true"
         >
             <image>
-                <Image url="@/images/image.png"/>
+                <Image url="@/images/logoApp.png"/>
             </image>
         </ImageView>
     </StackPane>

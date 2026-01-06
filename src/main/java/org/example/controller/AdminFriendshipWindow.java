@@ -8,12 +8,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.domain.*;
 import org.example.service.FriendshipService;
-import org.example.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendshipManagerWindow implements Observer {
+public class AdminFriendshipWindow implements Observer {
 
     private List<Observer> observers = new ArrayList<>();
 

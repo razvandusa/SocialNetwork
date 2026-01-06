@@ -5,6 +5,7 @@ import org.example.domain.User;
 import org.example.exceptions.EntityAlreadyExists;
 import org.example.exceptions.EntityNotFoundException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
+import org.example.repository.FriendshipDataBaseRepository;
 import org.example.repository.Repository;
 import org.example.validation.ValidatorContext;
 
@@ -312,6 +313,14 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         Long start = component.getFirst();
         Long farthest = bfsFarthestNode(start, graph, component);
         return bfsMaxDistance(farthest, graph, component);
+    }
+
+    public int getNumberOfFriends(Long userId) {
+        return ((FriendshipDataBaseRepository) repository).countFriendsOfUser(userId);
+    }
+
+    public List<User> findFriends(Long userId, int page, int pageSize) {
+        return ((FriendshipDataBaseRepository) repository).findFriends(userId, page, pageSize);
     }
 
 }
