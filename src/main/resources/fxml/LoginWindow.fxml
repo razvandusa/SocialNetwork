@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.LoginWindow"
+      spacing="25"
+      alignment="TOP_CENTER"
+      style="-fx-background-color: #197d13;">
+
+    <StackPane prefHeight="150" style="-fx-background-color: #F4F2EF;">
+        <ImageView fx:id="logoImage"
+                   fitHeight="120"
+                   pickOnBounds="true"
+                   preserveRatio="true"
+        >
+            <image>
+                <Image url="@/images/image.png"/>
+            </image>
+        </ImageView>
+    </StackPane>
+
+    <Label text="Welcome to LuckyLink!"
+           styleClass="welcome-label"/>
+
+    <VBox spacing="12" alignment="CENTER">
+        <TextField fx:id="usernameField"
+                   promptText="Username"
+                   prefWidth="150"
+                   styleClass="credentials-fields"/>
+
+        <PasswordField fx:id="passwordField"
+                       promptText="Password"
+                       prefWidth="150"
+                       styleClass="credentials-fields"/>
+    </VBox>
+
+    <Button fx:id="loginButton"
+            text="Login"
+            minWidth="250"
+            styleClass="login-button"/>
+
+</VBox>

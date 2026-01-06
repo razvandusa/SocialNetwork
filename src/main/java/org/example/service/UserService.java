@@ -207,4 +207,19 @@ public class UserService extends AbstractService<Long, User> {
     public long getDucksCountByType(String type) {
         return ((UserDataBaseRepository)repository).getDucksCountByType(type);
     }
+
+    public User login(String username, String password) {
+        for (User user : (List<User>) repository.findAll()) {
+
+            if (user == null) {
+                continue;
+            }
+
+            if (user.getUsername().equals(username)
+                    && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+        return null;
+    }
 }

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-public class MainWindow implements Observer {
+public class AdminWindow implements Observer {
 
     public Label labelPage;
 

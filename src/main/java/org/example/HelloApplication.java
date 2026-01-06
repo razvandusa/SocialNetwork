@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.example.controller.MainWindow;
+import org.example.controller.LoginWindow;
 import org.example.domain.Event;
 import org.example.domain.Flock;
 import org.example.domain.Friendship;
@@ -47,13 +47,13 @@ public class HelloApplication extends Application {
         FlockService flockService = new FlockService(flockRepository, userRepository, flockValidator);
         EventService eventService = new EventService(eventRepository, userRepository, eventValidator);
 
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MainWindow.fxml"));
-        Scene scene = new Scene(loader.load(), 1360, 740);
-        MainWindow controller = loader.getController();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginWindow.fxml"));
+        Scene scene = new Scene(loader.load(), 480, 700);
+        LoginWindow controller = loader.getController();
         controller.setUserService(userService);
         controller.setFriendshipService(friendshipService);
-        stage.setTitle("Social Network");
-        scene.getStylesheets().add(getClass().getResource("/css/main-window.css").toExternalForm());
+        stage.setTitle("LuckyLink");
+        scene.getStylesheets().add(getClass().getResource("/css/login-window.css").toExternalForm());
         stage.setScene(scene);
         stage.show();
     }
