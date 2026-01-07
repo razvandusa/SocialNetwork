@@ -1,5 +1,8 @@
 package org.example.domain;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Represents a generic user in the social network.
  * Each user has a unique identifier, a username, an email, and a password.

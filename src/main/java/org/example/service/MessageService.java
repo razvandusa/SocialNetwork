@@ -24,14 +24,19 @@ public class MessageService extends AbstractService<Long, Message> {
     }
 
     @Override
-    public void add(String... fields) {
-        Long id = generateID();
+    public void add(String... fields) {}
+
+    public void sendMessage(String... fields) {
+        Message message;
         String text = fields[0];
         LocalDateTime timestamp = LocalDateTime.now();
-        Long fromId = Long.parseLong(fields[1]);
-        Long toId = Long.parseLong(fields[2]);
-
-        Message message = new Message(id, text, timestamp ,fromId, toId);
+        Long senderId = Long.parseLong(fields[1]);
+        Long receiverId = Long.parseLong(fields[2]);
+        message = new Message(generateID(), text, timestamp, senderId, receiverId);
+        if (fields.length == 4) {
+            Long replyToId = Long.parseLong(fields[3]);
+            message.setReplyTo(messageRepository.findById(replyToId));
+        }
         messageRepository.add(message);
         messages.add(message);
     }

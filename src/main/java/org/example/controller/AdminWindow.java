@@ -114,6 +114,11 @@ public class AdminWindow implements Observer {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+        List<User> allUsers = userService.getUsersPage(1L, userService.getUsersCount());
+        originalRows = allUsers.stream()
+                .filter(u -> u != null)
+                .map(this::mapToUserRow)
+                .toList();
         initializePagination();
         loadPage(1L);}
 
@@ -185,6 +190,32 @@ public class AdminWindow implements Observer {
         } else {
             this.totalPages = (long) Math.ceil(userService.getUsersCount() / (double) pageSize);
         }
+    }
+
+    private UserRow mapToUserRow(User u) {
+        if (u == null) return null;
+
+        UserRow r = new UserRow();
+        r.setId(u.getId());
+        r.setUserType(u.getUserType());
+        r.setUsername(u.getUsername());
+        r.setEmail(u.getEmail());
+        r.setPassword(u.getPassword());
+
+        if (u instanceof Person p) {
+            r.setSurname(p.getSurname());
+            r.setName(p.getName());
+            r.setBirthDate(p.getBirthdate());
+            r.setOccupation(p.getOccupation());
+        }
+
+        if (u instanceof Duck d) {
+            r.setDuckType(d.getDuckType());
+            r.setSpeed(d.getSpeed());
+            r.setResistance(d.getResistance());
+        }
+
+        return r;
     }
 
     public void loadPage(Long pageNumber) {

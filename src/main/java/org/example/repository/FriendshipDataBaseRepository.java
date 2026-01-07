@@ -110,7 +110,7 @@ public class FriendshipDataBaseRepository implements Repository<Long, Friendship
     }
 
     public List<User> findFriends(Long userId, int page, int pageSize) {
-        String sql = "SELECT u.id, u.userType, u.username, u.email, u.password " +
+        String sql = "SELECT u.* " +
                 "FROM users u " +
                 "JOIN friendships f ON (u.id = f.firstFriendId OR u.id = f.secondFriendId) " +
                 "WHERE (f.firstFriendId = ? OR f.secondFriendId = ?) AND u.id != ? " +

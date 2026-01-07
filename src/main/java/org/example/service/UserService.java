@@ -12,6 +12,8 @@ import org.example.repository.UserDataBaseRepository;
 import org.example.validation.ValidationStrategy;
 import org.example.validation.ValidatorContext;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -88,6 +90,7 @@ public class UserService extends AbstractService<Long, User> {
                         throw new DuckTypeValidationException("Invalid duck type: " + duckType);
                 }
                 validatorUser.validate(duck);
+                duck.setPassword(hashPassword(password));
                 repository.add(duck);
                 break;
             case "Person":
@@ -103,6 +106,7 @@ public class UserService extends AbstractService<Long, User> {
                 }
                 Person person = new Person(generateID(), userType, username, email, password, surname, name, localDateBirthdate, occupation);
                 validatorUser.validate(person);
+                person.setPassword(hashPassword(password));
                 repository.add(person);
                 break;
         }
@@ -216,10 +220,26 @@ public class UserService extends AbstractService<Long, User> {
             }
 
             if (user.getUsername().equals(username)
-                    && user.getPassword().equals(password)) {
+                    && user.getPassword().equals(hashPassword(password))) {
                 return user;
             }
         }
         return null;
+    }
+
+    public static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error hashing password", e);
+        }
     }
 }

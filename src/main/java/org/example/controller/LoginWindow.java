@@ -9,7 +9,9 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.example.domain.User;
+import org.example.service.FriendshipRequestService;
 import org.example.service.FriendshipService;
+import org.example.service.MessageService;
 import org.example.service.UserService;
 
 import java.io.IOException;
@@ -18,6 +20,8 @@ public class LoginWindow {
 
     private UserService userService;
     private FriendshipService friendshipService;
+    private FriendshipRequestService friendshipRequestService;
+    private MessageService messageService;
 
     @FXML
     private Button loginButton;
@@ -43,9 +47,11 @@ public class LoginWindow {
         this.userService = userService;
     }
 
-    public void setFriendshipService(FriendshipService friendshipService) {
-        this.friendshipService = friendshipService;
-    }
+    public void setFriendshipService(FriendshipService friendshipService) { this.friendshipService = friendshipService; }
+
+    public void setFriendshipRequestService(FriendshipRequestService friendshipRequestService) { this.friendshipRequestService = friendshipRequestService; }
+
+    public void setMessageService(MessageService messageService) { this.messageService = messageService; }
 
     @FXML
     private void handleLogin() throws IOException {
@@ -106,7 +112,10 @@ public class LoginWindow {
         Scene scene = new Scene(loader.load(), 360, 640);
 
         ProfileWindow controller = loader.getController();
+        controller.setUserService(userService);
         controller.setFriendshipService(friendshipService);
+        controller.setMessageService(messageService);
+        controller.setFriendshipRequestService(friendshipRequestService);
         controller.setUser(user);
         scene.getStylesheets().add(getClass().getResource("/css/profile-window.css").toExternalForm());
 

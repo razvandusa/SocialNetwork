@@ -146,11 +146,11 @@ public class UserValidationStrategy implements ValidationStrategy<User> {
         }
 
         if (surname.length() < 3 || surname.length() > 32) {
-            throw new UsernameValidationException("Username length must be between 3 and 32 characters");
+            throw new SurnameException("Surname length must be between 3 and 32 characters");
         }
 
         if (!surname.matches("^[A-Za-z]+$")) {
-            throw new UsernameValidationException("Username must start with a letter and contain only letters");
+            throw new SurnameException("Surname must start with a letter and contain only letters");
         }
     }
 
