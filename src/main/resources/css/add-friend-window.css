@@ -4,6 +4,14 @@
     -fx-text-fill: white;
 }
 
+#notifiationButton:hover {
+    -fx-border-color: #197d13;
+}
+
+#profileButton:hover {
+    -fx-border-color: #197d13;
+}
+
 .nav-button {
     -fx-background-color: #2bdb21;
     -fx-text-fill: white;
@@ -29,6 +37,7 @@
     -fx-font-weight: bold;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
+    -fx-border-color: #2bdb21
 }
 
 .nav-button:hover {

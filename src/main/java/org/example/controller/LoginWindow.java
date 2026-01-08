@@ -75,7 +75,7 @@ public class LoginWindow {
                 closeWindow((Stage) loginButton.getScene().getWindow());
             } else {
                 openUserWindow(user);
-                closeWindow((Stage) loginButton.getScene().getWindow());
+//                closeWindow((Stage) loginButton.getScene().getWindow());
             }
         } else {
             showInformationAlert("Login Failed", "Invalid username or password.", "");

@@ -93,7 +93,8 @@ public class ProfileWindow {
             scene.getStylesheets().add(getClass().getResource("/css/add-friend-window.css").toExternalForm());
 
             AddFriendWindow controller = loader.getController();
-            controller.setServices(userService, friendshipService, friendshipRequestService ,messageService, currentUser);
+            controller.setServices(userService, friendshipService, friendshipRequestService ,messageService, user);
+
 
             Stage stage = new Stage();
             stage.setTitle("Add Friend");

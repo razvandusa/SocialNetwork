@@ -21,10 +21,22 @@
                 </image>
             </ImageView>
         </HBox>
-        <HBox alignment="CENTER_RIGHT" spacing="10.0" style="-fx-padding: 0 20 0 0">
+        <HBox spacing="20" alignment="CENTER_RIGHT" style="-fx-padding: 0 20 0 0">
+            <children>
+                <!-- Butonul de Notificari -->
+                <Button fx:id="notifiationButton" mnemonicParsing="false" onAction="#handleFriendRequests" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;">
+                    <graphic>
+                        <ImageView fitHeight="30.0" fitWidth="30.0" preserveRatio="true">
+                            <image>
+                                <Image url="@../images/notificationDotIcon.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </children>
             <children>
                 <!-- Butonul de Profil -->
-                <Button fx:id="profileButton" mnemonicParsing="false" onAction="#handleProfile" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-color: #197d13; -fx-border-radius: 5; -fx-background-radius: 5;">
+                <Button fx:id="profileButton" mnemonicParsing="false" onAction="#handleProfile" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;">
                     <graphic>
                         <ImageView fitHeight="30.0" fitWidth="30.0" preserveRatio="true">
                             <image>

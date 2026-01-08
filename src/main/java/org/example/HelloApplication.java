@@ -17,7 +17,7 @@ import java.sql.SQLException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        String url = "jdbc:postgresql://localhost:5432/SocialNetwork";
+        String url = "jdbc:postgresql://localhost:5432/postgres";
         String user = "postgres";
         String password = "1234";
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
@@ -40,7 +40,7 @@ public class HelloApplication extends Application {
 
         UserService userService = new UserService(userRepository, userValidator);
         FriendshipService friendshipService = new FriendshipService(friendshipRepository, userRepository, friendshipValidator);
-        FriendshipRequestService friendshipRequestService = new FriendshipRequestService(friendshipRequestRepository);
+        FriendshipRequestService friendshipRequestService = new FriendshipRequestService(friendshipRequestRepository, friendshipRepository, userRepository);
         FlockService flockService = new FlockService(flockRepository, userRepository, flockValidator);
         EventService eventService = new EventService(eventRepository, userRepository, eventValidator);
         MessageService messageService = new MessageService(messageRepository);

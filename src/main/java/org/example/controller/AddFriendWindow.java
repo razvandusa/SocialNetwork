@@ -4,11 +4,14 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import org.example.domain.User;
 import org.example.service.FriendshipRequestService;
@@ -28,6 +31,9 @@ public class AddFriendWindow {
 
     @FXML
     private TableColumn<User, String> usernameColumn;
+
+    @FXML
+    private Button notifiationButton;
 
     @FXML
     private Button prevPageButton;
@@ -51,6 +57,7 @@ public class AddFriendWindow {
         this.messageService = messageService;
         this.currentUser = currentUser;
         loadUsers();
+        updateNotificationIcon();
     }
 
     @FXML
@@ -105,6 +112,30 @@ public class AddFriendWindow {
     }
 
     @FXML
+    private void handleFriendRequests() {
+        openFriendRequestWindow(currentUser);
+        closeWindow((Stage) usersTable.getScene().getWindow());
+    }
+
+    private void openFriendRequestWindow(User user) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/FriendRequestWindow.fxml"));
+            Scene scene = new Scene(loader.load(), 360, 750);
+
+            FriendRequestWindow controller = loader.getController();
+            controller.setServices(userService, friendshipService, friendshipRequestService, messageService, user);
+            scene.getStylesheets().add(getClass().getResource("/css/friend-request-window.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Friend Requests");
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     private void handleProfile() throws IOException {
         openUserWindow(currentUser);
         closeWindow((Stage) usersTable.getScene().getWindow());
@@ -128,5 +159,18 @@ public class AddFriendWindow {
         stage.setTitle("User Profile");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public void updateNotificationIcon() {
+
+        boolean hasNotifications = friendshipRequestService.hasPendingRequests(currentUser.getId());
+
+        ImageView iv = (ImageView) notifiationButton.getGraphic();
+
+        if (hasNotifications) {
+            iv.setImage(new Image(getClass().getResourceAsStream("/images/notificationDotIcon.png")));
+        } else {
+            iv.setImage(new Image(getClass().getResourceAsStream("/images/notificationIcon.png")));
+        }
     }
 }
