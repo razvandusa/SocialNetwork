@@ -8,7 +8,7 @@
 <VBox styleClass="body"
       xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.example.controller.AddFriendWindow"
+      fx:controller="org.example.controller.EventWindow"
       alignment="TOP_CENTER">
     <StackPane prefHeight="72" style="-fx-background-color: #F4F2EF;">
         <HBox spacing="20" alignment="CENTER_LEFT">
@@ -24,7 +24,7 @@
         <HBox spacing="20" alignment="CENTER_RIGHT" style="-fx-padding: 0 20 0 0">
             <children>
                 <!-- Butonul de Notificari -->
-                <Button fx:id="notificationButton" mnemonicParsing="false" onAction="#handleFriendRequests" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;">
+                <Button fx:id="notificationButton" mnemonicParsing="false" onAction="#handleNotifications" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;">
                     <graphic>
                         <ImageView fitHeight="30.0" fitWidth="30.0" preserveRatio="true">
                             <image>
@@ -50,10 +50,10 @@
     </StackPane>
 
     <VBox alignment="CENTER" layoutY="58.0" prefHeight="582.0" prefWidth="360.0" spacing="10.0" style="-fx-padding: 20; -fx-background-color: #197d13;">
-        <Label styleClass="header-label" text="Add your new Friends!" />
-        <TableView fx:id="usersTable" prefHeight="335.0" prefWidth="340.0" styleClass="table-view">
+        <TableView fx:id="eventsTable" prefHeight="335.0" prefWidth="340.0" styleClass="table-view">
             <columns>
-                <TableColumn fx:id="usernameColumn" prefWidth="113.33" styleClass="table-column" text="Username" />
+                <TableColumn fx:id="eventNameColumn" prefWidth="113.33" styleClass="table-column" text="Event Name" />
+                <TableColumn fx:id="eventTypeColumn" prefWidth="113.33" styleClass="table-column" text="Event Type" />
             </columns>
         </TableView>
         <HBox alignment="CENTER" spacing="10.0">
@@ -64,9 +64,16 @@
 
     <Region prefHeight="40"/>
 
-    <Button fx:id="addFriendButton" layoutX="79.0" layoutY="518.0" mnemonicParsing="false" onAction="#handleAddFriend" prefHeight="98.0" prefWidth="202.0" styleClass="action-button" text="Add Friend" textAlignment="CENTER">
-        <font>
-            <Font size="18.0" />
-        </font>
-    </Button>
+    <HBox spacing="20" alignment="CENTER" style="-fx-padding: 0 20 0 0">
+        <Button fx:id="subscribeButton" layoutX="79.0" layoutY="518.0" mnemonicParsing="false" onAction="#handleSubscribeEvent" prefHeight="49.0" prefWidth="150.0" styleClass="action-button-subscribe" text="Subscribe" textAlignment="CENTER">
+            <font>
+                <Font size="18.0" />
+            </font>
+        </Button>
+        <Button fx:id="unsubscribeButton" layoutX="79.0" layoutY="518.0" mnemonicParsing="false" onAction="#handleUnsubscribeEvent" prefHeight="49.0" prefWidth="150.0" styleClass="action-button-unsubscribe" text="Unsubscribe" textAlignment="CENTER">
+            <font>
+                <Font size="18.0" />
+            </font>
+        </Button>
+    </HBox>
 </VBox>

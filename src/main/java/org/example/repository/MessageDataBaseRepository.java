@@ -1,15 +1,13 @@
 package org.example.repository;
 
-import org.example.domain.Friendship;
 import org.example.domain.Message;
-import org.example.domain.User;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageDataBaseRepository implements Repository<Long, Message> {
+public class MessageDataBaseRepository implements MessageRepository {
     private final String url;
     private final String username;
     private final String password;
@@ -67,6 +65,7 @@ public class MessageDataBaseRepository implements Repository<Long, Message> {
         return null;
     }
 
+    @Override
     public List<Message> getMessagesBetweenUsers(Long userId1, Long userId2) {
         String sql = "SELECT * FROM messages WHERE (sender_id = ? AND recipient_id = ?) OR (sender_id = ? AND recipient_id = ?) ORDER BY timestamp";
         List<Message> messages = new ArrayList<>();

@@ -7,34 +7,32 @@ import org.example.exceptions.validationExceptions.duckExceptions.ResistanceVali
 import org.example.exceptions.validationExceptions.duckExceptions.SpeedValidationException;
 import org.example.exceptions.validationExceptions.personExceptions.BirthdateValidationException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
-import org.example.repository.Repository;
-import org.example.repository.UserDataBaseRepository;
-import org.example.validation.ValidationStrategy;
+import org.example.repository.UserRepository;
 import org.example.validation.ValidatorContext;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 /**
  * Service layer for managing {@link User}, {@link Duck}, and {@link Person} entities.
  */
-public class UserService extends AbstractService<Long, User> {
+public class UserService implements Service<Long, User> {
 
+    UserRepository userRepository;
     ValidatorContext<User> validatorUser;
 
     /**
      * Constructs a UserService with the given repository and validator.
      *
-     * @param repository repository used to store users
+     * @param userRepository repository used to store users
      * @param validatorUser validator used to validate user entities
      */
-    public UserService(Repository<Long, User> repository, ValidatorContext<User> validatorUser) {
-        super(repository);
+    public UserService(UserRepository userRepository, ValidatorContext<User> validatorUser) {
+        this.userRepository = userRepository;
         this.validatorUser = validatorUser;
     }
 
@@ -75,23 +73,18 @@ public class UserService extends AbstractService<Long, User> {
                 } catch (NumberFormatException e) {
                     throw new ResistanceValidationException("Resistance must be a valid number");
                 }
-                Duck duck;
-                switch (duckType) {
-                    case "SWIMMING":
-                        duck = new SwimmingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
-                        break;
-                    case "FLYING":
-                        duck = new FlyingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
-                        break;
-                    case "FLYING_AND_SWIMMING":
-                        duck = new FlyingSwimmingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
-                        break;
-                    default:
-                        throw new DuckTypeValidationException("Invalid duck type: " + duckType);
-                }
+                Duck duck = switch (duckType) {
+                    case "SWIMMING" ->
+                            new SwimmingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
+                    case "FLYING" ->
+                            new FlyingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
+                    case "FLYING_AND_SWIMMING" ->
+                            new FlyingSwimmingDuck(generateID(), userType, username, email, password, doubleSpeed, doubleResistance);
+                    default -> throw new DuckTypeValidationException("Invalid duck type: " + duckType);
+                };
                 validatorUser.validate(duck);
                 duck.setPassword(hashPassword(password));
-                repository.add(duck);
+                userRepository.add(duck);
                 break;
             case "Person":
                 LocalDate localDateBirthdate;
@@ -107,7 +100,7 @@ public class UserService extends AbstractService<Long, User> {
                 Person person = new Person(generateID(), userType, username, email, password, surname, name, localDateBirthdate, occupation);
                 validatorUser.validate(person);
                 person.setPassword(hashPassword(password));
-                repository.add(person);
+                userRepository.add(person);
                 break;
         }
     }
@@ -125,11 +118,16 @@ public class UserService extends AbstractService<Long, User> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        User user = repository.findById(longId);
+        User user = userRepository.findById(longId);
         if (user == null) {
             throw new EntityNotFoundException("The user with id " + id + " was not found");
         }
-        repository.remove(user);
+        userRepository.remove(user);
+    }
+
+    @Override
+    public Iterable<User> findAll() {
+        return userRepository.findAll();
     }
 
     /**
@@ -140,7 +138,7 @@ public class UserService extends AbstractService<Long, User> {
     @Override
     public Long generateID() {
         long maxNumber = 0;
-        for (User user : super.findAll()) {
+        for (User user : findAll()) {
             if (user.getId() > maxNumber) {
                 maxNumber = user.getId();
             }
@@ -160,60 +158,60 @@ public class UserService extends AbstractService<Long, User> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        return repository.findById(longId);
+        return userRepository.findById(longId);
     }
 
-    public List<User> findDuckByType(String duckType) {
-        List<User> filtered = new ArrayList<>();
-        List<User> allUsers = (List<User>) repository.findAll();
-
-        switch (duckType) {
-            case "SWIMMING":
-                for (User user : allUsers) {
-                    if (user instanceof Swimmer) {
-                        filtered.add(user);
-                    }
-                }
-                break;
-            case "FLYING":
-                for (User user : allUsers) {
-                    if (user instanceof Flyer) {
-                        filtered.add(user);
-                    }
-                }
-                break;
-            case "FLYING_AND_SWIMMING":
-                for (User user : allUsers) {
-                    if (user instanceof Flyer && user instanceof Swimmer) {
-                        filtered.add(user);
-                    }
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid duck type: " + duckType);
-        }
-
-        return filtered;
-    }
+//    public List<User> findDuckByType(String duckType) {
+//        List<User> filtered = new ArrayList<>();
+//        List<User> allUsers = (List<User>) userRepository.findAll();
+//
+//        switch (duckType) {
+//            case "SWIMMING":
+//                for (User user : allUsers) {
+//                    if (user instanceof Swimmer) {
+//                        filtered.add(user);
+//                    }
+//                }
+//                break;
+//            case "FLYING":
+//                for (User user : allUsers) {
+//                    if (user instanceof Flyer) {
+//                        filtered.add(user);
+//                    }
+//                }
+//                break;
+//            case "FLYING_AND_SWIMMING":
+//                for (User user : allUsers) {
+//                    if (user instanceof Flyer && user instanceof Swimmer) {
+//                        filtered.add(user);
+//                    }
+//                }
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Invalid duck type: " + duckType);
+//        }
+//
+//        return filtered;
+//    }
 
     public List<User> getUsersPage(Long pageNumber, Long pageSize) {
-        return ((UserDataBaseRepository)repository).getUsersPage(pageNumber, pageSize);
+        return userRepository.getUsersPage(pageNumber, pageSize);
     }
 
     public Long getUsersCount() {
-        return ((UserDataBaseRepository)repository).getUsersCount();
+        return userRepository.getUsersCount();
     }
 
     public List<User> getDucksPageByType(String type, Long page, Long pageSize) {
-        return ((UserDataBaseRepository)repository).findDucksPageByType(type, page, pageSize);
+        return userRepository.findDucksPageByType(type, page, pageSize);
     }
 
     public long getDucksCountByType(String type) {
-        return ((UserDataBaseRepository)repository).getDucksCountByType(type);
+        return userRepository.getDucksCountByType(type);
     }
 
     public User login(String username, String password) {
-        for (User user : (List<User>) repository.findAll()) {
+        for (User user : userRepository.findAll()) {
 
             if (user == null) {
                 continue;

@@ -14,9 +14,9 @@ import java.util.List;
 
 public class AdminFriendshipWindow implements Observer {
 
-    private List<Observer> observers = new ArrayList<>();
-
     private FriendshipService friendshipService;
+
+    private List<Observer> observers = new ArrayList<>();
 
     @FXML
     private TableView<Friendship> friendshipTable;
@@ -61,7 +61,7 @@ public class AdminFriendshipWindow implements Observer {
     }
 
     @Override
-    public void onNotification(String message) {
+    public void update(String message) {
         System.out.println(message);
         loadFriendships();
     }

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendshipDataBaseRepository implements Repository<Long, Friendship>{
+public class FriendshipDataBaseRepository implements FriendshipRepository{
     private final String url;
     private final String username;
     private final String password;
@@ -86,6 +86,7 @@ public class FriendshipDataBaseRepository implements Repository<Long, Friendship
         return null;
     }
 
+    @Override
     public int countFriendsOfUser(Long userId) {
         String sql = """
         SELECT COUNT(*) AS cnt
@@ -109,6 +110,7 @@ public class FriendshipDataBaseRepository implements Repository<Long, Friendship
         return 0;
     }
 
+    @Override
     public List<User> findFriends(Long userId, int page, int pageSize) {
         String sql = "SELECT u.* " +
                 "FROM users u " +

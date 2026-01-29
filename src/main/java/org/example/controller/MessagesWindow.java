@@ -14,10 +14,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.example.domain.Observer;
 import org.example.domain.User;
-import org.example.service.FriendshipRequestService;
-import org.example.service.FriendshipService;
-import org.example.service.MessageService;
-import org.example.service.UserService;
+import org.example.service.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -27,15 +24,12 @@ public class MessagesWindow implements Observer {
     private FriendshipService friendshipService;
     private FriendshipRequestService friendshipRequestService;
     private MessageService messageService;
+    private EventService eventService;
+
     private User currentUser;
     private ObservableList<User> friendsList = FXCollections.observableArrayList();
     private int currentPage = 1;
     private final int pageSize = 5;
-
-    @Override
-    public void onNotification(String message) {
-        loadFriends();
-    }
 
     @FXML
     private TableView<User> friendsTable;
@@ -49,6 +43,11 @@ public class MessagesWindow implements Observer {
     @FXML
     private Button nextPageButton;
 
+    @FXML
+    public void initialize() {
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+    }
+
     public void setUserService(UserService userService) {
         this.userService = userService;
     }
@@ -59,13 +58,9 @@ public class MessagesWindow implements Observer {
 
     public void setMessageService(MessageService messageService) { this.messageService = messageService; }
 
-    @FXML
-    public void initialize() {
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-    }
+    public void setEventService(EventService eventService) { this.eventService = eventService; }
 
-    private void
-    loadFriends() {
+    private void loadFriends() {
         List<User> friends = friendshipService.findFriends(currentUser.getId(), currentPage, pageSize);
         friendsList.setAll(friends);
         friendsTable.setItems(friendsList);
@@ -113,14 +108,6 @@ public class MessagesWindow implements Observer {
         }
     }
 
-    private void showAlert(String title, String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
     @FXML
     private void handleProfile() throws IOException {
         openUserWindow(currentUser);
@@ -136,6 +123,7 @@ public class MessagesWindow implements Observer {
         controller.setFriendshipService(friendshipService);
         controller.setFriendshipRequestService(friendshipRequestService);
         controller.setMessageService(messageService);
+        controller.setEventService(eventService);
         controller.setUser(user);
         scene.getStylesheets().add(getClass().getResource("/css/profile-window.css").toExternalForm());
 
@@ -146,6 +134,19 @@ public class MessagesWindow implements Observer {
     }
 
     private void closeWindow(Stage stage) { stage.close(); }
+
+    private void showAlert(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    @Override
+    public void update(String message) {
+        loadFriends();
+    }
 
     public void setCurrentUser(User currentUser) {
         this.currentUser = currentUser;

@@ -17,7 +17,7 @@ import java.sql.SQLException;
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        String url = "jdbc:postgresql://localhost:5432/postgres";
+        String url = "jdbc:postgresql://localhost:5432/SocialNetwork";
         String user = "postgres";
         String password = "1234";
         try (Connection conn = DriverManager.getConnection(url, user, password)) {
@@ -26,12 +26,12 @@ public class HelloApplication extends Application {
             e.printStackTrace();
         }
 
-        Repository<Long, User> userRepository = new UserDataBaseRepository(url, user, password);
-        Repository<Long, Friendship> friendshipRepository = new FriendshipDataBaseRepository(url, user, password);
-        Repository<Long, FriendshipRequest> friendshipRequestRepository = new FriendshipRequestDataBaseRepository(url, user, password);
-        Repository<Long, Flock> flockRepository = new FlockDataBaseRepository(url, user, password);
-        Repository<Long, Event> eventRepository = new EventDataBaseRepository(url, user, password);
-        Repository<Long, Message> messageRepository = new MessageDataBaseRepository(url, user, password);
+        UserRepository userRepository = new UserDataBaseRepository(url, user, password);
+        FriendshipRepository friendshipRepository = new FriendshipDataBaseRepository(url, user, password);
+        FriendshipRequestRepository friendshipRequestRepository = new FriendshipRequestDataBaseRepository(url, user, password);
+        FlockRepository flockRepository = new FlockDataBaseRepository(url, user, password);
+        EventRepository eventRepository = new EventDataBaseRepository(url, user, password);
+        MessageRepository messageRepository = new MessageDataBaseRepository(url, user, password);
 
         ValidatorContext<User> userValidator = new ValidatorContext<>(new UserValidationStrategy());
         ValidatorContext<Friendship> friendshipValidator = new ValidatorContext<>(new FriendshipValidationStrategy());
@@ -52,6 +52,7 @@ public class HelloApplication extends Application {
         controller.setFriendshipService(friendshipService);
         controller.setFriendshipRequestService(friendshipRequestService);
         controller.setMessageService(messageService);
+        controller.setEventService(eventService);
 
         stage.setTitle("LuckyLink - Login page");
         scene.getStylesheets().add(getClass().getResource("/css/login-window.css").toExternalForm());

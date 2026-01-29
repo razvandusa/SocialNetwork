@@ -1,7 +1,5 @@
 package org.example.domain;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -10,10 +8,8 @@ import java.util.Objects;
  *
  * @param <ID> the type of the unique identifier
  */
-public class Entity<ID> implements Serializable {
+public class Entity<ID> {
     /** Unique identifier for the class version, used by Java to verify compatibility during serialization */
-    @Serial
-    private static final long serialVersionUID = 7331115341259248461L;
     private ID id;
 
     public Entity(ID id) {

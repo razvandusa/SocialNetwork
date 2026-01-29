@@ -26,6 +26,7 @@ public class ChatWindow {
     private Label selectedMessageLabel;
 
     private MessageService messageService;
+
     private User currentUser;
     private User chatUser;
     private Message selectedMessage;

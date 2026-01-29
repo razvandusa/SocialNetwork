@@ -1,30 +1,34 @@
 package org.example.service;
 
+import org.example.controller.EventWindow;
 import org.example.domain.*;
 import org.example.exceptions.EntityNotFoundException;
 import org.example.exceptions.validationExceptions.eventExceptions.EventAlreadyExists;
 import org.example.exceptions.validationExceptions.eventExceptions.NotEnoughLanesException;
 import org.example.exceptions.validationExceptions.eventExceptions.NotEnoughParticipantsException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
-import org.example.repository.EventDataBaseRepository;
 import org.example.repository.EventFileRepository;
-import org.example.repository.Repository;
+import org.example.repository.EventRepository;
+import org.example.repository.UserRepository;
 import org.example.validation.ValidatorContext;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class EventService extends AbstractService<Long, Event> {
-    private final Repository<Long, User> userRepository;
+public class EventService implements Service<Long, Event>, Subject {
+    private final EventRepository eventRepository;
+    private final UserRepository userRepository;
     private final ValidatorContext<Event> validatorEvent;
+    private final List<Observer> observers = new ArrayList<>();
+
     /**
      * Creates an AbstractService with the given Repository
      *
      * @param eventRepository the repository used by the service
      */
-    public EventService(Repository<Long, Event> eventRepository, Repository<Long, User> userRepository, ValidatorContext<Event> validatorEvent) {
-        super(eventRepository);
+    public EventService(EventRepository eventRepository, UserRepository userRepository, ValidatorContext<Event> validatorEvent) {
+        this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.validatorEvent = validatorEvent;
     }
@@ -36,7 +40,7 @@ public class EventService extends AbstractService<Long, Event> {
      * @param fields a variable number of strings representing the event data:
      *               the first parameter is the event type (e.g., "RaceEvent"),
      *               and the second parameter is the event name.
-     * @throws EventAlreadyExists  if an event with the given name already exists.
+     * @throws EventAlreadyExists if an event with the given name already exists.
      */
     @Override
     public void add(String... fields) {
@@ -56,7 +60,7 @@ public class EventService extends AbstractService<Long, Event> {
             throw new EventAlreadyExists("An event with this name already exists!");
         }
 
-        repository.add(event);
+        eventRepository.add(event);
     }
 
     /**
@@ -64,7 +68,7 @@ public class EventService extends AbstractService<Long, Event> {
      * or if the event is not found, appropriate exceptions are thrown.
      *
      * @param id the identifier of the event to be removed
-     * @throws IdValidationException if the specified id cannot be parsed as long
+     * @throws IdValidationException   if the specified id cannot be parsed as long
      * @throws EntityNotFoundException if no event with the specified id exists
      */
     @Override
@@ -75,10 +79,20 @@ public class EventService extends AbstractService<Long, Event> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longId) == null) {
+        if (eventRepository.findById(longId) == null) {
             throw new EntityNotFoundException("The event with id " + id + " was not found");
         }
-        repository.remove(repository.findById(longId));
+        eventRepository.remove(eventRepository.findById(longId));
+    }
+
+    /**
+     * Returns all entities managed by this service.
+     *
+     * @return an iterable containing all entities
+     */
+    @Override
+    public Iterable<Event> findAll() {
+        return eventRepository.findAll();
     }
 
     /**
@@ -91,7 +105,7 @@ public class EventService extends AbstractService<Long, Event> {
     @Override
     public Long generateID() {
         long maxNumber = 0;
-        for (Event event : super.findAll()) {
+        for (Event event : findAll()) {
             if (event.getId() > maxNumber) {
                 maxNumber = event.getId();
             }
@@ -106,8 +120,8 @@ public class EventService extends AbstractService<Long, Event> {
      * @return {@code true} if an event with the given name exists, {@code false} otherwise
      */
     public boolean exists(String flockName) {
-        for (Event existingEvent : repository.findAll()) {
-            if (existingEvent.getEventName().equals(flockName)) {
+        for (Event existingEvent : eventRepository.findAll()) {
+            if (existingEvent.getName().equals(flockName)) {
                 return true;
             }
         }
@@ -120,9 +134,9 @@ public class EventService extends AbstractService<Long, Event> {
      * If the user is already a spectator of the event, an exception is thrown.
      *
      * @param eventId the identifier of the event to which the user will be added as a spectator
-     * @param userId the identifier of the user to be added as a spectator to the event
-     * @throws IdValidationException if the eventId or userId cannot be parsed as long
-     * @throws EntityNotFoundException if no event or user with the specified id exists
+     * @param userId  the identifier of the user to be added as a spectator to the event
+     * @throws IdValidationException    if the eventId or userId cannot be parsed as long
+     * @throws EntityNotFoundException  if no event or user with the specified id exists
      * @throws IllegalArgumentException if the user is already a spectator of the event
      */
     public void addSpectatorToEvent(String eventId, String userId) {
@@ -132,10 +146,10 @@ public class EventService extends AbstractService<Long, Event> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longEventId) == null) {
+        if (eventRepository.findById(longEventId) == null) {
             throw new EntityNotFoundException("The event with id " + eventId + " was not found");
         }
-        Event event = repository.findById(longEventId);
+        Event event = eventRepository.findById(longEventId);
 
         long longUserId;
         try {
@@ -153,7 +167,7 @@ public class EventService extends AbstractService<Long, Event> {
             );
         }
 
-        ((EventDataBaseRepository) repository).addSpectatorToEvent(longEventId, longUserId);
+        eventRepository.addSpectatorToEvent(longEventId, longUserId);
     }
 
     /**
@@ -162,9 +176,9 @@ public class EventService extends AbstractService<Long, Event> {
      * If the user is not a spectator of the event, an exception is thrown.
      *
      * @param eventId the identifier of the event from which the spectator will be removed
-     * @param userId the identifier of the user to be removed as a spectator from the event
-     * @throws IdValidationException if the eventId or userId cannot be parsed as long
-     * @throws EntityNotFoundException if no event or user with the specified id exists
+     * @param userId  the identifier of the user to be removed as a spectator from the event
+     * @throws IdValidationException    if the eventId or userId cannot be parsed as long
+     * @throws EntityNotFoundException  if no event or user with the specified id exists
      * @throws IllegalArgumentException if the user is not a spectator of the event
      */
     public void removeSpectatorFromEvent(String eventId, String userId) {
@@ -174,10 +188,10 @@ public class EventService extends AbstractService<Long, Event> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longEventId) == null) {
+        if (eventRepository.findById(longEventId) == null) {
             throw new EntityNotFoundException("The event with id " + eventId + " was not found");
         }
-        Event event = repository.findById(longEventId);
+        Event event = eventRepository.findById(longEventId);
 
         long longUserId;
         try {
@@ -196,7 +210,7 @@ public class EventService extends AbstractService<Long, Event> {
             );
         }
 
-        ((EventDataBaseRepository) repository).removeSpectatorFromEvent(longEventId, longUserId);
+        eventRepository.removeSpectatorFromEvent(longEventId, longUserId);
     }
 
     /**
@@ -206,9 +220,9 @@ public class EventService extends AbstractService<Long, Event> {
      * already a participant in the RaceEvent or a spectator in the event.
      *
      * @param eventId the identifier of the event to which the participant will be added
-     * @param userId the identifier of the user to be added as a participant
-     * @throws IdValidationException if the eventId or userId cannot be parsed as long
-     * @throws EntityNotFoundException if no event or user with the specified id exists, or if the user is not a Duck
+     * @param userId  the identifier of the user to be added as a participant
+     * @throws IdValidationException    if the eventId or userId cannot be parsed as long
+     * @throws EntityNotFoundException  if no event or user with the specified id exists, or if the user is not a Duck
      * @throws IllegalArgumentException if the event is not a RaceEvent, if the Duck is not a Swimmer,
      *                                  if the user is already a spectator, or if the user is already a participant
      */
@@ -219,10 +233,10 @@ public class EventService extends AbstractService<Long, Event> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longEventId) == null) {
+        if (eventRepository.findById(longEventId) == null) {
             throw new EntityNotFoundException("The event with id " + eventId + " was not found");
         }
-        Event event = repository.findById(longEventId);
+        Event event = eventRepository.findById(longEventId);
 
         long longUserId;
         try {
@@ -235,15 +249,13 @@ public class EventService extends AbstractService<Long, Event> {
         }
         User user = userRepository.findById(longUserId);
 
-        if (!(event instanceof RaceEvent)) {
+        if (!(event instanceof RaceEvent raceEvent)) {
             throw new IllegalArgumentException("Only RaceEvents can have participants");
         }
-        RaceEvent raceEvent = (RaceEvent) event;
 
-        if (!(user instanceof Duck)) {
+        if (!(user instanceof Duck duck)) {
             throw new EntityNotFoundException("The user with id " + userId + " is not a duck");
         }
-        Duck duck = (Duck) user;
 
         if (event.getSubscribers().contains(user)) {
             throw new IllegalArgumentException(
@@ -263,7 +275,7 @@ public class EventService extends AbstractService<Long, Event> {
             );
         }
 
-        ((EventDataBaseRepository) repository).addParticipantToEvent(longEventId, longUserId);
+        eventRepository.addParticipantToEvent(longEventId, longUserId);
     }
 
     /**
@@ -273,9 +285,9 @@ public class EventService extends AbstractService<Long, Event> {
      * before removal.
      *
      * @param eventId the identifier of the event from which the participant will be removed
-     * @param duckId the identifier of the duck to be removed as a participant from the event
-     * @throws IdValidationException if the eventId or duckId cannot be parsed as long
-     * @throws EntityNotFoundException if no event or user with the specified ID exists, or if the user is not a Duck
+     * @param duckId  the identifier of the duck to be removed as a participant from the event
+     * @throws IdValidationException    if the eventId or duckId cannot be parsed as long
+     * @throws EntityNotFoundException  if no event or user with the specified ID exists, or if the user is not a Duck
      * @throws IllegalArgumentException if the event is not a RaceEvent, if the Duck is not a Swimmer,
      *                                  or if the Duck is not a participant of the RaceEvent
      */
@@ -286,10 +298,10 @@ public class EventService extends AbstractService<Long, Event> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longEventId) == null) {
+        if (eventRepository.findById(longEventId) == null) {
             throw new EntityNotFoundException("The event with id " + eventId + " was not found");
         }
-        Event event = repository.findById(longEventId);
+        Event event = eventRepository.findById(longEventId);
 
         long longDuckId;
         try {
@@ -302,14 +314,13 @@ public class EventService extends AbstractService<Long, Event> {
         }
         User user = userRepository.findById(longDuckId);
 
-        if (!(event instanceof RaceEvent)) {
+        if (!(event instanceof RaceEvent raceEvent)) {
             throw new IllegalArgumentException("Only RaceEvents can have participants");
         }
 
-        if (!(user instanceof Duck)) {
+        if (!(user instanceof Duck duck)) {
             throw new EntityNotFoundException("The user with id " + duckId + " is not a duck");
         }
-        Duck duck = (Duck) user;
 
         if (!(duck instanceof Swimmer)) {
             throw new IllegalArgumentException(
@@ -317,15 +328,13 @@ public class EventService extends AbstractService<Long, Event> {
             );
         }
 
-        RaceEvent raceEvent = (RaceEvent) event;
-
         if (!raceEvent.getParticipants().contains((Swimmer) duck)) {
             throw new IllegalArgumentException(
                     "The duck with id " + duckId + " is not a participant in this event"
             );
         }
 
-        ((EventDataBaseRepository) repository).removeParticipantFromEvent(longEventId, longDuckId);
+        eventRepository.removeParticipantFromEvent(longEventId, longDuckId);
     }
 
     /**
@@ -335,10 +344,10 @@ public class EventService extends AbstractService<Long, Event> {
      * the distance of the last existing lane. If validations fail, corresponding
      * exceptions are thrown.
      *
-     * @param eventId the identifier of the RaceEvent to which the lane will be added
+     * @param eventId   the identifier of the RaceEvent to which the lane will be added
      * @param laneValue the value of the lane to be added, in numeric format
-     * @throws IdValidationException if the eventId cannot be parsed as long
-     * @throws EntityNotFoundException if no event with the specified ID exists
+     * @throws IdValidationException    if the eventId cannot be parsed as long
+     * @throws EntityNotFoundException  if no event with the specified ID exists
      * @throws IllegalArgumentException if the event is not a RaceEvent, or
      *                                  if the laneValue is invalid or less than
      *                                  or equal to the last existing lane distance
@@ -351,12 +360,12 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IdValidationException("The id must be a number");
         }
 
-        Event event = repository.findById(longEventId);
+        Event event = eventRepository.findById(longEventId);
         if (event == null) {
             throw new EntityNotFoundException("The event with id " + eventId + " was not found");
         }
 
-        if (!(event instanceof RaceEvent)) {
+        if (!(event instanceof RaceEvent raceEvent)) {
             throw new IllegalArgumentException("The event is not a RaceEvent");
         }
 
@@ -367,26 +376,24 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IllegalArgumentException("Lane must be a number");
         }
 
-        RaceEvent raceEvent = (RaceEvent) event;
-
         List<Double> existingLanes = raceEvent.getLanes();
         if (!existingLanes.isEmpty() && doubleLaneValue <= existingLanes.getLast()) {
             throw new IllegalArgumentException("Lane distance must be greater than the previous lane distance");
         }
 
-        ((EventDataBaseRepository) repository).addLaneToEvent(longEventId, doubleLaneValue);
+        eventRepository.addLaneToEvent(longEventId, doubleLaneValue);
     }
 
     /**
      * Removes a lane from a specific race event identified by its event ID and lane index.
      *
-     * @param eventId the unique identifier of the race event. Must be a numeric string.
+     * @param eventId    the unique identifier of the race event. Must be a numeric string.
      * @param indexValue the 1-based index of the lane to be removed from the race event. Must be a numeric string.
-     * @throws IdValidationException if the provided event ID is not a valid number.
-     * @throws EntityNotFoundException if no event is found with the provided ID.
-     * @throws IllegalArgumentException if the event is not a RaceEvent,
-     *                                  if the index value is not a valid number,
-     *                                  or if there are no lanes to remove.
+     * @throws IdValidationException     if the provided event ID is not a valid number.
+     * @throws EntityNotFoundException   if no event is found with the provided ID.
+     * @throws IllegalArgumentException  if the event is not a RaceEvent,
+     *                                   if the index value is not a valid number,
+     *                                   or if there are no lanes to remove.
      * @throws IndexOutOfBoundsException if the specified lane index is out of the valid range.
      */
     public void removeLaneFromRaceEvent(String eventId, String indexValue) {
@@ -397,24 +404,22 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IdValidationException("The id must be a number");
         }
 
-        Event event = repository.findById(longEventId);
+        Event event = eventRepository.findById(longEventId);
         if (event == null) {
             throw new EntityNotFoundException("The event with id " + eventId + " was not found");
         }
 
-        if (!(event instanceof RaceEvent)) {
+        if (!(event instanceof RaceEvent raceEvent)) {
             throw new IllegalArgumentException("The event is not a RaceEvent");
         }
 
-        Long intIndexValue;
+        long intIndexValue;
         try {
             intIndexValue = Long.parseLong(indexValue);
             intIndexValue--;
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Index must be a number");
         }
-
-        RaceEvent raceEvent = (RaceEvent) event;
 
         List<Double> lanes = raceEvent.getLanes();
         if (lanes.isEmpty()) {
@@ -424,7 +429,7 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IndexOutOfBoundsException("Invalid lane index: " + intIndexValue);
         }
 
-        ((EventDataBaseRepository) repository).removeLaneFromEvent(longEventId, intIndexValue);
+        eventRepository.removeLaneFromEvent(longEventId, intIndexValue);
     }
 
     /**
@@ -432,8 +437,8 @@ public class EventService extends AbstractService<Long, Event> {
      *
      * @param eventId the unique identifier of the event, provided as a String
      * @return a list of lane numbers represented as Double values
-     * @throws IdValidationException if the provided event ID is not a valid number
-     * @throws EntityNotFoundException if no event is found with the provided ID
+     * @throws IdValidationException    if the provided event ID is not a valid number
+     * @throws EntityNotFoundException  if no event is found with the provided ID
      * @throws IllegalArgumentException if the event associated with the ID is not a RaceEvent
      */
     public List<Lane> getLanes(String eventId) {
@@ -444,7 +449,7 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IdValidationException("The id must be a number");
         }
 
-        Event event = repository.findById(longEventId);
+        Event event = eventRepository.findById(longEventId);
         if (event == null) {
             throw new EntityNotFoundException("The event with id " + eventId + " was not found");
         }
@@ -453,8 +458,7 @@ public class EventService extends AbstractService<Long, Event> {
             throw new IllegalArgumentException("The event is not a RaceEvent");
         }
 
-        List<Lane> lanes = ((EventDataBaseRepository) repository).getLanes(longEventId);
-        return lanes;
+        return eventRepository.getLanes(longEventId);
     }
 
     /**
@@ -464,39 +468,78 @@ public class EventService extends AbstractService<Long, Event> {
      * the best ducks for the given race lanes.
      *
      * @param eventId the identifier of the event to start. It must be a string representing a valid number.
-     * @return a list of DuckResult objects representing the results of the best participating ducks in the race event.
-     * @throws IdValidationException if the provided eventId is not a valid numeric value.
+     * @throws IdValidationException          if the provided eventId is not a valid numeric value.
      * @throws NotEnoughParticipantsException if the race event does not have enough participants compared to the number of lanes.
-     * @throws NotEnoughLanesException if the race event does not have enough lanes to start.
-     * @throws EntityNotFoundException if the event with the specified ID is not found.
+     * @throws NotEnoughLanesException        if the race event does not have enough lanes to start.
+     * @throws EntityNotFoundException        if the event with the specified ID is not found.
      */
-    public List<DuckResult> start(String eventId) {
+    public void start(String eventId) {
         long longEventId;
         try {
             longEventId = Long.parseLong(eventId);
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        for (Event event : super.findAll()) {
-            if (event.getId() == longEventId) {
-                if (event.getEventType().equals("RaceEvent")) {
-                    if (((RaceEvent) event).getLanes().size() > ((RaceEvent) event).getParticipants().size()) {
-                        throw new NotEnoughParticipantsException("The event can't start because the number of lanes is greater than the number of participants");
-                    }
-                    if (((RaceEvent) event).getLanes().isEmpty()) {
-                        throw new NotEnoughLanesException("The event can't start because the number of lanes is empty");
-                    }
-                    event.notifySubscribers("Race Event " + event.getEventName() + " has started!");
-                    List<Duck> duckList = new ArrayList<>();
-                    for (Swimmer s : ((RaceEvent)event).getParticipants()) {
-                        duckList.add((Duck) s);
-                    }
-                    return bestDuckSelection(duckList, ((RaceEvent)event).getLanes());
-                }
+        Event event = findById(eventId);
+        if (event == null) {
+            throw new EntityNotFoundException("The event with id " + eventId + " was not found");
+        } else if (event.getType().equals("RaceEvent")) {
+            if (((RaceEvent) event).getLanes().size() > ((RaceEvent) event).getParticipants().size()) {
+                throw new NotEnoughParticipantsException("The event can't start because the number of lanes is greater than the number of participants");
             }
+            if (((RaceEvent) event).getLanes().isEmpty()) {
+                throw new NotEnoughLanesException("The event can't start because the number of lanes is empty");
+            }
+            eventRepository.updateStatusEvent(event.getId(), true);
+            event.startEvent();
+            notifyObservers(event);
         }
+    }
 
-        throw new EntityNotFoundException("The event with id " + eventId + " was not found");
+    public void reset(String eventId) {
+        long longEventId;
+        try {
+            longEventId = Long.parseLong(eventId);
+        } catch (NumberFormatException e) {
+            throw new IdValidationException("The id must be a number");
+        }
+        Event event = findById(eventId);
+        if (event == null) {
+            throw new EntityNotFoundException("The event with id " + eventId + " was not found");
+        }
+        eventRepository.updateStatusEvent(event.getId(), false);
+    }
+
+    public StringBuilder getResults(String eventId) {
+        long longEventId;
+        try {
+            longEventId = Long.parseLong(eventId);
+        } catch (NumberFormatException e) {
+            throw new IdValidationException("The id must be a number");
+        }
+        Event event = findById(eventId);
+        if (event == null) {
+            throw new EntityNotFoundException("The event with id " + eventId + " was not found");
+        } else if (event.getType().equals("RaceEvent")){
+            List<Duck> duckList = new ArrayList<>();
+            for (Swimmer s : ((RaceEvent)event).getParticipants()) {
+                duckList.add((Duck) s);
+            }
+            List<DuckResult> results = bestDuckSelection(duckList, ((RaceEvent)event).getLanes());
+            StringBuilder sb = new StringBuilder();
+            double total = 0;
+            sb.append("=== Race Results ===\n");
+            for (int i = 0; i < results.size(); i++) {
+                DuckResult dr = results.get(i);
+                sb.append("Duck ").append(dr.getDuck().getId()).append(" on lane ").append(i + 1).append(": t = ").append(String.format("%.3f", dr.getTime())).append(" s\n");
+
+                total = Math.max(total, dr.getTime());
+            }
+
+            sb.append("Total race duration = ").append(String.format("%.3f", total)).append(" s\n");
+            return sb;
+        }
+        return new StringBuilder();
     }
 
     /**
@@ -594,7 +637,7 @@ public class EventService extends AbstractService<Long, Event> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        return repository.findById(longId);
+        return eventRepository.findById(longId);
     }
 
     /**
@@ -615,9 +658,8 @@ public class EventService extends AbstractService<Long, Event> {
         }
 
         boolean removed = false;
-        for (Event event : repository.findAll()) {
-            if (event instanceof RaceEvent) {
-                RaceEvent raceEvent = (RaceEvent) event;
+        for (Event event : eventRepository.findAll()) {
+            if (event instanceof RaceEvent raceEvent) {
                 List<Swimmer> participantsToRemove = new ArrayList<>();
                 for (Swimmer swimmer : raceEvent.getParticipants()) {
                     if (((Duck)swimmer).getId() == longUserId) {
@@ -643,7 +685,45 @@ public class EventService extends AbstractService<Long, Event> {
         }
 
         if (removed) {
-            ((EventFileRepository) repository).save();
+            ((EventFileRepository) eventRepository).save();
+        }
+    }
+
+    public List<Event> findEvents(User user) {
+        List<Event> subscribedEvents = new ArrayList<>();
+
+        for (Event event : eventRepository.findAll()) {
+            if (event.getSubscribers().contains(user)) {
+                subscribedEvents.add(event);
+            }
+        }
+        return subscribedEvents;
+    }
+
+    @Override
+    public void addObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers(String message) {
+    }
+
+    public void notifyObservers(Event event) {
+        for (Observer o : observers) {
+            if (o instanceof EventWindow ew) {
+                for (User user : userRepository.findAll()) {
+                    if (Objects.equals(user.getId(), ew.getCurrentUser().getId()) && event.getSubscribers().contains(user)) {
+                        o.update("");
+                    }
+                }
+            }
         }
     }
 }
+

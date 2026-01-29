@@ -1,9 +1,9 @@
 package org.example.domain;
 
 public interface Subject {
-    void subscribe(Observer o);
+    void addObserver(Observer o);
 
-    void unsubscribe(Observer o);
+    void removeObserver(Observer o);
 
-    void notifySubscribers(String message);
+    void notifyObservers(String message);
 }

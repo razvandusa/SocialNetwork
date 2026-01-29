@@ -45,6 +45,15 @@
                     </ImageView>
                 </graphic>
             </Button>
+            <Button fx:id="eventButton" mnemonicParsing="false" onAction="#handleEvents" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;">
+                <graphic>
+                    <ImageView fitHeight="30.0" fitWidth="30.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/eventIcon.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
         </HBox>
     </StackPane>
 
@@ -60,12 +69,14 @@
         </VBox>
     </HBox>
 
-    <VBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="366.0" prefHeight="40.0" prefWidth="319.0" spacing="5" style="-fx-padding: 10; -fx-background-color: white;">
+    <VBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="366.0" prefWidth="319.0" spacing="5" style="-fx-padding: 10; -fx-background-color: white;">
         <children>
-            <HBox alignment="CENTER_LEFT" spacing="5">
-                <Label prefHeight="20.0" prefWidth="71.0" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Friends:" />
+            <VBox alignment="CENTER_LEFT" spacing="5">
+                <Label prefHeight="20.0" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Friends:" />
                 <Label fx:id="friends" prefHeight="27.0" style="-fx-font-size: 14px;" />
-            </HBox>
+                <Label prefHeight="20.0" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Occupation:" />
+                <Label fx:id="occupation" prefHeight="27.0" style="-fx-font-size: 14px;" />
+            </VBox>
         </children>
     </VBox>
 

@@ -12,9 +12,9 @@ import java.util.List;
 
 public class AdminUserWindow implements Subject {
 
-    private List<Observer> observers = new ArrayList<>();
-
     private UserService userService;
+
+    private List<Observer> observers = new ArrayList<>();
 
     @FXML
     private TextField fieldUserId;
@@ -71,10 +71,10 @@ public class AdminUserWindow implements Subject {
         try {
             if (userType.equals("Person")) {
                 userService.add(userType, username, email, password, surname, name, birthdate, occupation);
-                notifySubscribers("User added successfully!");
+                notifyObservers("User added successfully!");
             } else if (userType.equals("Duck")) {
                 userService.add(userType, username, email, password, duckType, speed, resistance);
-                notifySubscribers("User added successfully!");
+                notifyObservers("User added successfully!");
             } else {
                 throw new IllegalArgumentException("Invalid user type +" + userType);
             }
@@ -91,7 +91,7 @@ public class AdminUserWindow implements Subject {
         String userId = fieldUserId.getText();
         try {
             userService.remove(userId);
-            notifySubscribers("User removed successfully!");
+            notifyObservers("User removed successfully!");
         } catch (Exception e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setTitle("Warning");
@@ -102,19 +102,19 @@ public class AdminUserWindow implements Subject {
     }
 
     @Override
-    public void subscribe(Observer o) {
+    public void addObserver(Observer o) {
         observers.add(o);
     }
 
     @Override
-    public void unsubscribe(Observer o) {
+    public void removeObserver(Observer o) {
         observers.remove(o);
     }
 
     @Override
-    public void notifySubscribers(String message) {
+    public void notifyObservers(String message) {
         for (Observer observer : observers) {
-            observer.onNotification(message);
+            observer.update(message);
         }
     }
 }

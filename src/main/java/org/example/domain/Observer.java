@@ -1,5 +1,5 @@
 package org.example.domain;
 
 public interface Observer {
-    void onNotification(String message);
+    void update(String message);
 }

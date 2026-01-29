@@ -2,23 +2,17 @@ package org.example.service;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.example.domain.Friendship;
 import org.example.domain.Message;
-import org.example.domain.User;
-import org.example.repository.MessageDataBaseRepository;
-import org.example.repository.Repository;
-import org.example.repository.UserDataBaseRepository;
-import org.example.validation.ValidatorContext;
+import org.example.repository.MessageRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class MessageService extends AbstractService<Long, Message> {
-    private final Repository<Long, Message> messageRepository;
+public class MessageService implements Service<Long, Message> {
+    private final MessageRepository messageRepository;
     private final ObservableList<Message> messages;
 
-    public MessageService(Repository<Long, Message> messageRepository) {
-        super(messageRepository);
+    public MessageService(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
         this.messages = FXCollections.observableArrayList();
     }
@@ -42,7 +36,7 @@ public class MessageService extends AbstractService<Long, Message> {
     }
 
     public ObservableList<Message> getMessagesBetweenUsers(Long userId1, Long userId2) {
-        List<Message> messageList = ((MessageDataBaseRepository)messageRepository).getMessagesBetweenUsers(userId1, userId2);
+        List<Message> messageList = messageRepository.getMessagesBetweenUsers(userId1, userId2);
         messages.setAll(messageList);
         return messages;
     }
@@ -51,9 +45,14 @@ public class MessageService extends AbstractService<Long, Message> {
     public void remove(String id) {}
 
     @Override
+    public Iterable<Message> findAll() {
+        return messageRepository.findAll();
+    }
+
+    @Override
     public Long generateID() {
         long maxNumber = 0;
-        for (Message message : super.findAll()) {
+        for (Message message : findAll()) {
             if (message.getId() > maxNumber) {
                 maxNumber = message.getId();
             }

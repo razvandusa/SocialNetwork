@@ -3,16 +3,12 @@ package org.example.service;
 import org.example.domain.*;
 import org.example.exceptions.EntityNotFoundException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
-import org.example.repository.FlockDataBaseRepository;
-import org.example.repository.FlockFileRepository;
-import org.example.repository.Repository;
+import org.example.repository.*;
 import org.example.validation.ValidatorContext;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class FlockService extends AbstractService<Long, Flock>{
-    private final Repository<Long, User> userRepository;
+public class FlockService implements Service<Long, Flock>{
+    private final FlockRepository flockRepository;
+    private final UserRepository userRepository;
     private final ValidatorContext<Flock> validatorFlock;
 
     /**
@@ -20,8 +16,8 @@ public class FlockService extends AbstractService<Long, Flock>{
      *
      * @param userRepository the repository used by the service
      */
-    public FlockService(Repository<Long, Flock> flockRepository, Repository<Long, User> userRepository, ValidatorContext<Flock> validatorFlock) {
-        super(flockRepository);
+    public FlockService(FlockRepository flockRepository, UserRepository userRepository, ValidatorContext<Flock> validatorFlock) {
+        this.flockRepository = flockRepository;
         this.userRepository = userRepository;
         this.validatorFlock = validatorFlock;
     }
@@ -46,7 +42,7 @@ public class FlockService extends AbstractService<Long, Flock>{
             throw new IllegalArgumentException("A flock with this name already exists!");
         }
 
-        repository.add(flock);
+        flockRepository.add(flock);
     }
 
     /**
@@ -66,10 +62,15 @@ public class FlockService extends AbstractService<Long, Flock>{
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longId) == null) {
+        if (flockRepository.findById(longId) == null) {
             throw new EntityNotFoundException("The flock with id " + id + " was not found");
         }
-        repository.remove(repository.findById(longId));
+        flockRepository.remove(flockRepository.findById(longId));
+    }
+
+    @Override
+    public Iterable<Flock> findAll() {
+        return flockRepository.findAll();
     }
 
     /**
@@ -81,7 +82,7 @@ public class FlockService extends AbstractService<Long, Flock>{
     @Override
     public Long generateID() {
         long maxNumber = 0;
-        for (Flock flock : super.findAll()) {
+        for (Flock flock : findAll()) {
             if (flock.getId() > maxNumber) {
                 maxNumber = flock.getId();
             }
@@ -96,7 +97,7 @@ public class FlockService extends AbstractService<Long, Flock>{
      * @return {@code true} if a flock with the given name exists, {@code false} otherwise
      */
     public boolean exists(String flockName) {
-        for (Flock existingFlock : repository.findAll()) {
+        for (Flock existingFlock : flockRepository.findAll()) {
             if (existingFlock.getFlockName().equals(flockName)) {
                 return true;
             }
@@ -120,10 +121,10 @@ public class FlockService extends AbstractService<Long, Flock>{
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longFlockId) == null) {
+        if (flockRepository.findById(longFlockId) == null) {
             throw new EntityNotFoundException("The flock with id " + flockId + " was not found");
         }
-        Flock flock = repository.findById(longFlockId);
+        Flock flock = flockRepository.findById(longFlockId);
 
         long longDuckId;
         try {
@@ -135,10 +136,9 @@ public class FlockService extends AbstractService<Long, Flock>{
             throw new EntityNotFoundException("The duck with id " + duckId + " was not found");
         }
         User user = userRepository.findById(longDuckId);
-        if (!(user instanceof Duck)) {
+        if (!(user instanceof Duck duck)) {
             throw new EntityNotFoundException("The duck with id " + duckId + " was not found");
         }
-        Duck duck = (Duck) user;
 
         String flockType = flock.getFlockType();
         if ((flockType.equals("Flyer") && !(duck instanceof Flyer)) ||
@@ -151,7 +151,7 @@ public class FlockService extends AbstractService<Long, Flock>{
             );
         }
 
-        ((FlockDataBaseRepository) repository).addDuckToFlock(longFlockId, longDuckId);
+        flockRepository.addDuckToFlock(longFlockId, longDuckId);
     }
 
     /**
@@ -173,10 +173,10 @@ public class FlockService extends AbstractService<Long, Flock>{
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longFlockId) == null) {
+        if (flockRepository.findById(longFlockId) == null) {
             throw new EntityNotFoundException("The flock with id " + flockId + " was not found");
         }
-        Flock flock = repository.findById(longFlockId);
+        Flock flock = flockRepository.findById(longFlockId);
 
         long longDuckId;
         try {
@@ -188,10 +188,9 @@ public class FlockService extends AbstractService<Long, Flock>{
             throw new EntityNotFoundException("The duck with id " + flockId + " was not found");
         }
         User user = userRepository.findById(longDuckId);
-        if (!(user instanceof Duck)) {
+        if (!(user instanceof Duck duck)) {
             throw new EntityNotFoundException("The duck with id " + flockId + " was not found");
         }
-        Duck duck = (Duck) user;
 
         String flockType = flock.getFlockType();
         if ((flockType.equals("Flyer") && !(duck instanceof Flyer)) ||
@@ -203,42 +202,42 @@ public class FlockService extends AbstractService<Long, Flock>{
             throw new IllegalArgumentException("The duck with id " + duckId + " is not a part of this flock");
         }
 
-        ((FlockDataBaseRepository) repository).removeDuckFromFlock(longFlockId, longDuckId);
+        flockRepository.removeDuckFromFlock(longFlockId, longDuckId);
     }
 
-    /**
-     * Removes a duck, identified by its unique identifier, from all flocks in the repository.
-     * Validates the duck ID before attempting removal. If the ID is invalid or no duck with the
-     * specified identifier exists in any flock, an exception is thrown. Saves changes if any
-     * removals are made.
-     *
-     * @param duckId the unique identifier of the duck to be removed from all flocks
-     * @throws IdValidationException if the provided duckId is not a valid numeric value
-     */
-    public void removeDuckFromAllFlocks(String duckId) {
-        long longDuckId;
-        try {
-            longDuckId = Long.parseLong(duckId);
-        } catch (NumberFormatException e) {
-            throw new IdValidationException("The id must be a number");
-        }
-
-        boolean removed = false;
-        for (Flock flock : repository.findAll()) {
-            List<Duck> ducksToRemove = new ArrayList<>();
-            for (Duck duck : flock.getDucks()) {
-                if (duck.getId().equals(longDuckId)) {
-                    ducksToRemove.add(duck);
-                }
-            }
-            if (!ducksToRemove.isEmpty()) {
-                flock.getDucks().removeAll(ducksToRemove);
-                removed = true;
-            }
-        }
-
-        if (removed) {
-            ((FlockFileRepository) repository).save();
-        }
-    }
+//    /**
+//     * Removes a duck, identified by its unique identifier, from all flocks in the repository.
+//     * Validates the duck ID before attempting removal. If the ID is invalid or no duck with the
+//     * specified identifier exists in any flock, an exception is thrown. Saves changes if any
+//     * removals are made.
+//     *
+//     * @param duckId the unique identifier of the duck to be removed from all flocks
+//     * @throws IdValidationException if the provided duckId is not a valid numeric value
+//     */
+//    public void removeDuckFromAllFlocks(String duckId) {
+//        long longDuckId;
+//        try {
+//            longDuckId = Long.parseLong(duckId);
+//        } catch (NumberFormatException e) {
+//            throw new IdValidationException("The id must be a number");
+//        }
+//
+//        boolean removed = false;
+//        for (Flock flock : flockRepository.findAll()) {
+//            List<Duck> ducksToRemove = new ArrayList<>();
+//            for (Duck duck : flock.getDucks()) {
+//                if (duck.getId().equals(longDuckId)) {
+//                    ducksToRemove.add(duck);
+//                }
+//            }
+//            if (!ducksToRemove.isEmpty()) {
+//                flock.getDucks().removeAll(ducksToRemove);
+//                removed = true;
+//            }
+//        }
+//
+//        if (removed) {
+//            ((FlockFileRepository) flockRepository).save();
+//        }
+//    }
 }

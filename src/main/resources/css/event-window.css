@@ -21,7 +21,7 @@
     -fx-background-radius: 5px;
 }
 
-.action-button {
+.action-button-subscribe {
     -fx-text-fill: #197d13;
     -fx-background-color: white;
     -fx-font-size: 16px;
@@ -30,7 +30,7 @@
     -fx-background-radius: 5;
 }
 
-.action-button:hover {
+.action-button-subscribe:hover {
     -fx-text-fill: #2bdb21;
     -fx-background-color: white;
     -fx-font-size: 16px;
@@ -38,6 +38,25 @@
     -fx-border-radius: 5;
     -fx-background-radius: 5;
     -fx-border-color: #2bdb21
+}
+
+.action-button-unsubscribe {
+    -fx-text-fill: #197d13;
+    -fx-background-color: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.action-button-unsubscribe:hover {
+    -fx-text-fill: #c11111;
+    -fx-background-color: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-border-color: #c11111
 }
 
 .nav-button:hover {

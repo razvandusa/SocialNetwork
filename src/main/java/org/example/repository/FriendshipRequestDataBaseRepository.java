@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class FriendshipRequestDataBaseRepository implements Repository<Long, FriendshipRequest> {
+public class FriendshipRequestDataBaseRepository implements FriendshipRequestRepository {
     private final String url;
     private final String username;
     private final String password;
@@ -19,6 +19,7 @@ public class FriendshipRequestDataBaseRepository implements Repository<Long, Fri
         this.password = password;
     }
 
+    @Override
     public List<User> getFriendRequests(Long userId) {
         String sql = "SELECT u.* " +
                 "FROM users u " +
@@ -63,6 +64,7 @@ public class FriendshipRequestDataBaseRepository implements Repository<Long, Fri
         }
     }
 
+    @Override
     public void sendFriendRequest(Long userId, Long friendId) {
         String sql = "INSERT INTO friendship_requests (idsender, idrecipient, status) VALUES (?, ?, 'PENDING')";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -75,6 +77,7 @@ public class FriendshipRequestDataBaseRepository implements Repository<Long, Fri
         }
     }
 
+    @Override
     public Optional<FriendshipRequest> save(FriendshipRequest entity) {
         String sql = "INSERT INTO friendship_requests (idsender, idrecipient, status) VALUES (?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -97,6 +100,7 @@ public class FriendshipRequestDataBaseRepository implements Repository<Long, Fri
         return Optional.of(entity);
     }
 
+    @Override
     public List<User> getFriendRequestsUser(Long userId) {
         String sql = "SELECT u.* " +
                 "FROM users u " +
@@ -139,13 +143,15 @@ public class FriendshipRequestDataBaseRepository implements Repository<Long, Fri
         }
     }
 
-    protected void setPreparedStatementParametersForUpdate(PreparedStatement statement, FriendshipRequest entity) throws SQLException {
+    @Override
+    public void setPreparedStatementParametersForUpdate(PreparedStatement statement, FriendshipRequest entity) throws SQLException {
         statement.setLong(1, entity.getSender().getId());
         statement.setLong(2, entity.getRecipient().getId());
         statement.setString(3, entity.getStatus().name());
         statement.setLong(4, entity.getId());
     }
 
+    @Override
     public void updateFR(FriendshipRequest entity) {
         String sql = "UPDATE friendship_requests SET idsender = ?, idrecipient = ?, status = ? WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -157,7 +163,8 @@ public class FriendshipRequestDataBaseRepository implements Repository<Long, Fri
         }
     }
 
-    private Optional<User> findUserById(Long userId) {
+    @Override
+    public Optional<User> findUserById(Long userId) {
         String sql = "SELECT * FROM users WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(url, username, password);
             PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -194,7 +201,8 @@ public class FriendshipRequestDataBaseRepository implements Repository<Long, Fri
         return Optional.empty();
     }
 
-    protected FriendshipRequest mapResultSetToEntity(ResultSet resultSet) throws SQLException {
+    @Override
+    public FriendshipRequest mapResultSetToEntity(ResultSet resultSet) throws SQLException {
         Long idRequest = resultSet.getLong("id");
         Long idSender = resultSet.getLong("idsender");
         Long idRecipient = resultSet.getLong("idrecipient");
@@ -210,6 +218,7 @@ public class FriendshipRequestDataBaseRepository implements Repository<Long, Fri
         return request;
     }
 
+    @Override
     public Optional<FriendshipRequest> findRequestBySenderAndRecipient(Long senderId, Long recipientId) {
         String sql = "SELECT * FROM friendship_requests WHERE idsender = ? AND idrecipient = ?";
         try (Connection conn = DriverManager.getConnection(url, username, password);

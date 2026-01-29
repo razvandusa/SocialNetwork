@@ -15,7 +15,7 @@ import java.sql.SQLException;
 
 public class Main {
     static void main() {
-        String url = "jdbc:postgresql://localhost:5432/postgres";
+        String url = "jdbc:postgresql://localhost:5432/SocialNetwork";
         String user = "postgres";
         String password = "1234";
 
@@ -25,10 +25,10 @@ public class Main {
             e.printStackTrace();
         }
 
-        Repository<Long, User> userRepository = new UserDataBaseRepository(url, user, password);
-        Repository<Long, Friendship> friendshipRepository = new FriendshipDataBaseRepository(url, user, password);
-        Repository<Long, Flock> flockRepository = new FlockDataBaseRepository(url, user, password);
-        Repository<Long, Event> eventRepository = new EventDataBaseRepository(url, user, password);
+        UserRepository userRepository = new UserDataBaseRepository(url, user, password);
+        FriendshipRepository friendshipRepository = new FriendshipDataBaseRepository(url, user, password);
+        FlockRepository flockRepository = new FlockDataBaseRepository(url, user, password);
+        EventRepository eventRepository = new EventDataBaseRepository(url, user, password);
 
         ValidatorContext<User> userValidator = new ValidatorContext<>(new UserValidationStrategy());
         ValidatorContext<Friendship> friendshipValidator = new ValidatorContext<>(new FriendshipValidationStrategy());

@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDataBaseRepository implements Repository<Long, User>{
+public class UserDataBaseRepository implements UserRepository{
     private final String url;
     private final String username;
     private final String password;
@@ -127,6 +127,7 @@ public class UserDataBaseRepository implements Repository<Long, User>{
         return null;
     }
 
+    @Override
     public List<User> getUsersPage(Long pageNumber, Long pageSize) {
         String sql = "SELECT * FROM users ORDER BY id LIMIT ? OFFSET ?";
         Long offset = (pageNumber - 1) * pageSize;
@@ -147,6 +148,7 @@ public class UserDataBaseRepository implements Repository<Long, User>{
         return users;
     }
 
+    @Override
     public Long getUsersCount() {
         String sql = "SELECT COUNT(*) FROM users";
         Long count = 0L;
@@ -162,6 +164,7 @@ public class UserDataBaseRepository implements Repository<Long, User>{
         return count;
     }
 
+    @Override
     public List<User> findDucksPageByType(String type, Long pageNumber, Long pageSize) {
         long offset = (pageNumber - 1) * pageSize;
 
@@ -190,6 +193,7 @@ public class UserDataBaseRepository implements Repository<Long, User>{
         return ducks;
     }
 
+    @Override
     public Long getDucksCountByType(String type) {
         String sql = """
                      SELECT COUNT(*)

@@ -10,10 +10,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.example.domain.User;
-import org.example.service.FriendshipRequestService;
-import org.example.service.FriendshipService;
-import org.example.service.MessageService;
-import org.example.service.UserService;
+import org.example.service.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,21 +33,24 @@ public class FriendRequestWindow {
     private FriendshipService friendshipService;
     private FriendshipRequestService friendshipRequestService;
     private MessageService messageService;
+    private EventService eventService;
+
     private User currentUser;
     private ObservableList<User> friendRequests;
-
-    public void setServices(UserService userService, FriendshipService friendshipService, FriendshipRequestService friendshipRequestService, MessageService messageService, User currentUser) {
-        this.userService = userService;
-        this.friendshipService = friendshipService;
-        this.friendshipRequestService = friendshipRequestService;
-        this.messageService = messageService;
-        this.currentUser = currentUser;
-        loadFriendRequests();
-    }
 
     @FXML
     public void initialize() {
         usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
+    }
+
+    public void setServices(UserService userService, FriendshipService friendshipService, FriendshipRequestService friendshipRequestService, MessageService messageService, EventService eventService, User currentUser) {
+        this.userService = userService;
+        this.friendshipService = friendshipService;
+        this.friendshipRequestService = friendshipRequestService;
+        this.messageService = messageService;
+        this.eventService = eventService;
+        this.currentUser = currentUser;
+        loadFriendRequests();
     }
 
     private void loadFriendRequests() {
@@ -95,6 +95,7 @@ public class FriendRequestWindow {
         controller.setFriendshipService(friendshipService);
         controller.setFriendshipRequestService(friendshipRequestService);
         controller.setMessageService(messageService);
+        controller.setEventService(eventService);
         controller.setUser(user);
         scene.getStylesheets().add(getClass().getResource("/css/profile-window.css").toExternalForm());
 

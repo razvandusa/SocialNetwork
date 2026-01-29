@@ -2,7 +2,6 @@ package org.example.repository;
 
 import org.example.domain.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,45 +38,43 @@ public class EventFileRepository extends AbstractFileRepository<Long, Event> {
         String eventType = data.get(1);
         String eventName = data.get(2);
 
-        switch (eventType) {
-            case "RaceEvent":
-                String[] subscribersIDs = new String[0];
-                String[] participantsIDs = new String[0];
-                String[] lanesDistances = new String[0];
-                RaceEvent raceEvent = new RaceEvent(id, eventType, eventName);
+        if (eventType.equals("RaceEvent")) {
+            String[] subscribersIDs = new String[0];
+            String[] participantsIDs = new String[0];
+            String[] lanesDistances = new String[0];
+            RaceEvent raceEvent = new RaceEvent(id, eventType, eventName);
 
-                if (data.size() > 3 && !data.get(3).isEmpty()) {
-                    subscribersIDs = data.get(3).split(",");
-                }
+            if (data.size() > 3 && !data.get(3).isEmpty()) {
+                subscribersIDs = data.get(3).split(",");
+            }
 
-                for (String userID : subscribersIDs) {
-                    User user = userRepository.findById(Long.parseLong(userID));
-                    raceEvent.subscribe(user);
-                }
+            for (String userID : subscribersIDs) {
+                User user = userRepository.findById(Long.parseLong(userID));
+                raceEvent.addObserver(user);
+            }
 
-                if (data.size() > 4 && !data.get(4).isEmpty()) {
-                    participantsIDs = data.get(4).split(",");
-                }
+            if (data.size() > 4 && !data.get(4).isEmpty()) {
+                participantsIDs = data.get(4).split(",");
+            }
 
-                for (String participantID : participantsIDs) {
-                    User user = userRepository.findById(Long.parseLong(participantID));
-                    if (user instanceof Duck && user instanceof Swimmer) {
-                        raceEvent.addParticipant((Swimmer) user);
-                    }
+            for (String participantID : participantsIDs) {
+                User user = userRepository.findById(Long.parseLong(participantID));
+                if (user instanceof Duck && user instanceof Swimmer) {
+                    raceEvent.addParticipant((Swimmer) user);
                 }
+            }
 
-                if (data.size() > 5 && !data.get(5).isEmpty()) {
-                    lanesDistances = data.get(5).split(",");
-                }
+            if (data.size() > 5 && !data.get(5).isEmpty()) {
+                lanesDistances = data.get(5).split(",");
+            }
 
-                for (String laneDistance : lanesDistances) {
-                    Double distance = Double.parseDouble(laneDistance);
-                    raceEvent.addLane(distance);
-                }
-                return raceEvent;
-            default:
-                throw new IllegalArgumentException("Invalid event type: " + eventType);
+            for (String laneDistance : lanesDistances) {
+                Double distance = Double.parseDouble(laneDistance);
+                raceEvent.addLane(distance);
+            }
+            return raceEvent;
         }
+        throw new IllegalArgumentException("Invalid event type: " + eventType);
     }
 
     /**
@@ -89,10 +86,10 @@ public class EventFileRepository extends AbstractFileRepository<Long, Event> {
     @Override
     protected String createEntityAsString(Event entity) {
         StringBuilder sb = new StringBuilder();
-        if (entity.getEventType().equals("RaceEvent")) {
+        if (entity.getType().equals("RaceEvent")) {
             sb.append(entity.getId()).append(";");
-            sb.append(entity.getEventType()).append(";");
-            sb.append(entity.getEventName()).append(";");
+            sb.append(entity.getType()).append(";");
+            sb.append(entity.getName()).append(";");
 
             List<Observer> subs = entity.getSubscribers();
             for (int i = 0; i < subs.size(); i++) {

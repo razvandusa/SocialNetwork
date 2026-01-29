@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventDataBaseRepository implements Repository<Long, Event> {
+public class EventDataBaseRepository implements EventRepository {
     private final String url;
     private final String username;
     private final String password;
@@ -24,8 +24,8 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
         try (Connection conn = DriverManager.getConnection(url, username, password);
             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, entity.getId());
-            ps.setString(2, entity.getEventType());
-            ps.setString(3, entity.getEventName());
+            ps.setString(2, entity.getType());
+            ps.setString(3, entity.getName());
             ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,10 +55,12 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
                     Long eventId = rs.getLong("id");
-                    eventType = rs.getString("eventType");
-                    String eventName = rs.getString("eventName");
+                    eventType = rs.getString("eventtype");
+                    String eventName = rs.getString("eventname");
+                    boolean status = rs.getBoolean("status");
                     if (eventType.equals("RaceEvent")) {
                         event = new RaceEvent(eventId, eventType, eventName);
+                        event.setStatus(status);
                     } else {
                         return null;
                     }
@@ -84,17 +86,17 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
                         String name = rs.getString("name");
                         LocalDate birthdate = rs.getDate("birthdate").toLocalDate();
                         String occupation = rs.getString("occupation");
-                        event.subscribe(new Person(userId, userType, username, email, password, surname, name, birthdate, occupation));
+                        event.addObserver(new Person(userId, userType, username, email, password, surname, name, birthdate, occupation));
                     } else if (userType.equals("Duck")) {
                         String duckType = rs.getString("duckType");
                         Double speed = rs.getDouble("speed");
                         Double resistance = rs.getDouble("resistance");
                         if (duckType.equals("SWIMMING")) {
-                            event.subscribe(new SwimmingDuck(userId, userType, username, email, password, speed, resistance));
+                            event.addObserver(new SwimmingDuck(userId, userType, username, email, password, speed, resistance));
                         } else if (duckType.equals("FLYING")) {
-                            event.subscribe(new FlyingDuck(userId, userType, username, email, password, speed, resistance));
+                            event.addObserver(new FlyingDuck(userId, userType, username, email, password, speed, resistance));
                         } else if (duckType.equals("FLYING_AND_SWIMMING")) {
-                            event.subscribe(new FlyingSwimmingDuck(userId, userType, username, email, password, speed, resistance));
+                            event.addObserver(new FlyingSwimmingDuck(userId, userType, username, email, password, speed, resistance));
                         }
                     }
                 }
@@ -159,8 +161,8 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Long eventId = rs.getLong("id");
-                Event flock = findById(eventId);
-                events.add(flock);
+                Event event = findById(eventId);
+                events.add(event);
             }
             return events;
         } catch (SQLException e) {
@@ -169,6 +171,7 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
         return null;
     }
 
+    @Override
     public void addSpectatorToEvent(Long eventId, Long userId) {
         String sql = "INSERT INTO Event_Subscriber(eventId, subscriberId) VALUES (?, ?)";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -181,6 +184,7 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
         }
     }
 
+    @Override
     public void removeSpectatorFromEvent(Long eventId, Long userId) {
         String sql = "DELETE FROM Event_Subscriber WHERE eventId = ? AND subscriberId = ?";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -193,6 +197,7 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
         }
     }
 
+    @Override
     public void addParticipantToEvent(Long eventId, Long duckId) {
         String sql = "INSERT INTO RaceEvent_Participant(eventId, participantId) VALUES (?, ?)";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -205,6 +210,7 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
         }
     }
 
+    @Override
     public void removeParticipantFromEvent(Long eventId, Long duckId) {
         String sql = "DELETE FROM Event_Subscriber WHERE eventId = ? AND participantId = ?";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -217,6 +223,7 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
         }
     }
 
+    @Override
     public void addLaneToEvent(Long eventId, Double laneValue) {
         String sql = "INSERT INTO Lanes(eventId, laneValue) VALUES (?, ?)";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -229,6 +236,7 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
         }
     }
 
+    @Override
     public void removeLaneFromEvent(Long eventId, Long indexValue) {
         String sql = "DELETE FROM Lanes WHERE eventId = ? AND id = ?";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -241,6 +249,7 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
         }
     }
 
+    @Override
     public List<Lane> getLanes(Long eventId) {
         List<Lane> lanes = new ArrayList<>();
         String sql = "SELECT * FROM Lanes WHERE eventId = ?";
@@ -258,5 +267,18 @@ public class EventDataBaseRepository implements Repository<Long, Event> {
             e.printStackTrace();
         }
         return lanes;
+    }
+
+    @Override
+    public void updateStatusEvent(Long eventId, boolean status) {
+        String sql = "UPDATE events SET status = ? WHERE id = ?";
+        try (Connection conn = DriverManager.getConnection(url, username, password);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setBoolean(1, status);
+            ps.setLong(2, eventId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

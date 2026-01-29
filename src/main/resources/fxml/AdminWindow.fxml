@@ -41,5 +41,6 @@
             <HBox alignment="BOTTOM_LEFT" spacing="5">
                 <Button text="Users" onAction="#openUserManagerWindow"/>
                 <Button text="Friendships" onAction="#openFriendshipManagerWindow"/>
+                <Button text="Events" onAction="#openEventManagerWindow"/>
             </HBox>
 </VBox>

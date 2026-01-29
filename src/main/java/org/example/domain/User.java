@@ -51,7 +51,7 @@ public abstract class User extends Entity<Long> implements Observer {
     }
 
     @Override
-    public void onNotification(String message) {
+    public void update(String message) {
         System.out.println(
                 "User[id=" + getId() +
                         ", username='" + username + "'] received notification: " + message
