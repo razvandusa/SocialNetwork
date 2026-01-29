@@ -29,4 +29,7 @@ javafx {
     modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
-application { mainClass = 'org.example.HelloApplication' }
+application {
+    mainClass = 'org.example.HelloApplication'
+    applicationDefaultJvmArgs = ["--enable-native-access=javafx.graphics"]
+}

@@ -1,5 +1,8 @@
 package org.example.domain;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 /**
  * Represents a generic user in the social network.
  * Each user has a unique identifier, a username, an email, and a password.
@@ -48,7 +51,7 @@ public abstract class User extends Entity<Long> implements Observer {
     }
 
     @Override
-    public void onNotification(String message) {
+    public void update(String message) {
         System.out.println(
                 "User[id=" + getId() +
                         ", username='" + username + "'] received notification: " + message

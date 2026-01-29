@@ -5,7 +5,8 @@ import org.example.domain.User;
 import org.example.exceptions.EntityAlreadyExists;
 import org.example.exceptions.EntityNotFoundException;
 import org.example.exceptions.validationExceptions.userExceptions.IdValidationException;
-import org.example.repository.Repository;
+import org.example.repository.FriendshipRepository;
+import org.example.repository.UserRepository;
 import org.example.validation.ValidatorContext;
 
 import java.util.*;
@@ -13,12 +14,13 @@ import java.util.*;
 /**
  * Service layer for managing {@link Friendship} entities.
  */
-public class FriendshipService extends AbstractService<Long, Friendship> {
-    private final Repository<Long, User> userRepository;
+public class FriendshipService implements Service<Long, Friendship> {
+    private final FriendshipRepository friendshipRepository;
+    private final UserRepository userRepository;
     private final ValidatorContext<Friendship> validatorFriendship;
 
-    public FriendshipService(Repository<Long, Friendship> friendshipRepository, Repository<Long, User> userRepository, ValidatorContext<Friendship> validatorFriendship) {
-        super(friendshipRepository);
+    public FriendshipService(FriendshipRepository friendshipRepository, UserRepository userRepository, ValidatorContext<Friendship> validatorFriendship) {
+        this.friendshipRepository = friendshipRepository;
         this.userRepository = userRepository;
         this.validatorFriendship = validatorFriendship;
     }
@@ -54,7 +56,7 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         if (exists(idFirstFriend, idSecondFriend)) {
             throw new EntityAlreadyExists("The friendship between " + idFirstFriend + " and " + idSecondFriend + " already exists");
         }
-        repository.add(new Friendship(generateID(), longIdFirstFriend, longIdSecondFriend));
+        friendshipRepository.add(new Friendship(generateID(), longIdFirstFriend, longIdSecondFriend));
     }
 
     /**
@@ -72,10 +74,15 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         } catch (NumberFormatException e) {
             throw new IdValidationException("The id must be a number");
         }
-        if (repository.findById(longId) == null) {
+        if (friendshipRepository.findById(longId) == null) {
             throw new EntityNotFoundException("The friendship with id " + id + " was not found");
         }
-        repository.remove(repository.findById(longId));
+        friendshipRepository.remove(friendshipRepository.findById(longId));
+    }
+
+    @Override
+    public Iterable<Friendship> findAll() {
+        return friendshipRepository.findAll();
     }
 
     /**
@@ -86,7 +93,7 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
     @Override
     public Long generateID() {
         long maxNumber = 0;
-        for (Friendship friendship : super.findAll()) {
+        for (Friendship friendship : findAll()) {
             if (friendship.getId() > maxNumber) {
                 maxNumber = friendship.getId();
             }
@@ -115,7 +122,7 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         } catch (NumberFormatException e) {
             throw new IdValidationException(e.getMessage());
         }
-        for (Friendship friendship : repository.findAll()) {
+        for (Friendship friendship : friendshipRepository.findAll()) {
             if (friendship.getFirstFriendId().equals(longIdFirstFriend) && friendship.getSecondFriendId().equals(longIdSecondFriend) ||
                     friendship.getFirstFriendId().equals(longIdSecondFriend)  && friendship.getSecondFriendId().equals(longIdFirstFriend)) {
                 return true;
@@ -124,29 +131,29 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         return false;
     }
 
-    /**
-     * Removes all friendships of a user given the user's id.
-     *
-     * @param id the id of the user whose friendships are to be removed
-     * @throws IdValidationException if the id is not a valid number
-     */
-    public void removeAllFriendshipsOfUser(String id) {
-        long longId;
-        try {
-            longId = Long.parseLong(id);
-        } catch (NumberFormatException e) {
-            throw new IdValidationException("The id must be a number");
-        }
-        List<Friendship> toRemove = new ArrayList<>();
-        for (Friendship friendship : repository.findAll()) {
-            if (friendship.getFirstFriendId().equals(longId) || friendship.getSecondFriendId().equals(longId)) {
-                toRemove.add(friendship);
-            }
-        }
-        for (Friendship friendship : toRemove) {
-            repository.remove(friendship);
-        }
-    }
+//    /**
+//     * Removes all friendships of a user given the user's id.
+//     *
+//     * @param id the id of the user whose friendships are to be removed
+//     * @throws IdValidationException if the id is not a valid number
+//     */
+//    public void removeAllFriendshipsOfUser(String id) {
+//        long longId;
+//        try {
+//            longId = Long.parseLong(id);
+//        } catch (NumberFormatException e) {
+//            throw new IdValidationException("The id must be a number");
+//        }
+//        List<Friendship> toRemove = new ArrayList<>();
+//        for (Friendship friendship : friendshipRepository.findAll()) {
+//            if (friendship.getFirstFriendId().equals(longId) || friendship.getSecondFriendId().equals(longId)) {
+//                toRemove.add(friendship);
+//            }
+//        }
+//        for (Friendship friendship : toRemove) {
+//            friendshipRepository.remove(friendship);
+//        }
+//    }
 
     /**
      * Returns the number of communities (connected groups of users) with at least two members.
@@ -172,7 +179,7 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
     private Map<Long, List<Long>> buildGraph() {
         Map<Long, List<Long>> graph = new HashMap<>();
         for (User user : userRepository.findAll()) graph.put(user.getId(), new ArrayList<>());
-        for (Friendship f : repository.findAll()) {
+        for (Friendship f : friendshipRepository.findAll()) {
             graph.get(f.getFirstFriendId()).add(f.getSecondFriendId());
             graph.get(f.getSecondFriendId()).add(f.getFirstFriendId());
         }
@@ -312,6 +319,14 @@ public class FriendshipService extends AbstractService<Long, Friendship> {
         Long start = component.getFirst();
         Long farthest = bfsFarthestNode(start, graph, component);
         return bfsMaxDistance(farthest, graph, component);
+    }
+
+    public int getNumberOfFriends(Long userId) {
+        return friendshipRepository.countFriendsOfUser(userId);
+    }
+
+    public List<User> findFriends(Long userId, int page, int pageSize) {
+        return friendshipRepository.findFriends(userId, page, pageSize);
     }
 
 }

@@ -10,6 +10,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import org.example.domain.*;
+import org.example.service.EventService;
 import org.example.service.FriendshipService;
 import org.example.service.UserService;
 
@@ -17,19 +18,19 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
-public class MainWindow implements Observer {
-
-    public Label labelPage;
+public class AdminWindow implements Observer {
 
     private UserService userService;
 
     private FriendshipService friendshipService;
 
-    private List<UserRow> originalRows;
+    private EventService eventService;
 
-    private UserManagerWindow userManagerController;
+    private AdminUserWindow userManagerController;
 
-    private FriendshipManagerWindow friendshipManagerController;
+    private AdminFriendshipWindow friendshipManagerController;
+
+    private AdminEventWindow eventManagerController;
 
     private Long currentPage = 1L;
 
@@ -40,6 +41,10 @@ public class MainWindow implements Observer {
     private boolean isFiltered = false;
 
     private String filterType = null;
+
+    private List<UserRow> originalRows;
+
+    public Label labelPage;
 
     @FXML
     private ComboBox<String> userTypeComboBox;
@@ -114,11 +119,20 @@ public class MainWindow implements Observer {
 
     public void setUserService(UserService userService) {
         this.userService = userService;
+        List<User> allUsers = userService.getUsersPage(1L, userService.getUsersCount());
+        originalRows = allUsers.stream()
+                .filter(u -> u != null)
+                .map(this::mapToUserRow)
+                .toList();
         initializePagination();
         loadPage(1L);}
 
     public void setFriendshipService(FriendshipService friendshipService) {
         this.friendshipService = friendshipService;}
+
+    public void setEventService(EventService eventService) {
+        this.eventService = eventService;
+    }
 
     private void loadUsers() {
         isFiltered = false;
@@ -143,13 +157,13 @@ public class MainWindow implements Observer {
 
     public void openUserManagerWindow() throws IOException {
         Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/UserManagerWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminUserWindow.fxml"));
         Scene scene = new Scene(loader.load(), 660, 640);
         this.userManagerController = loader.getController();
         userManagerController.setUserService(userService);
-        userManagerController.subscribe(this);
+        userManagerController.addObserver(this);
         if (friendshipManagerController != null) {
-            userManagerController.subscribe(friendshipManagerController);
+            userManagerController.addObserver(friendshipManagerController);
         }
         stage.setTitle("Manage Users");
         scene.getStylesheets().add(getClass().getResource("/css/user-manager-window.css").toExternalForm());
@@ -159,12 +173,12 @@ public class MainWindow implements Observer {
 
     public void openFriendshipManagerWindow() throws IOException {
         Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/FriendshipManagerWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminFriendshipWindow.fxml"));
         Scene scene = new Scene(loader.load(), 860, 640);
         this.friendshipManagerController = loader.getController();
         friendshipManagerController.setFriendshipService(friendshipService);
         if (userManagerController != null) {
-            userManagerController.subscribe(friendshipManagerController);
+            userManagerController.addObserver(friendshipManagerController);
         }
         stage.setTitle("Manage Friendships");
         scene.getStylesheets().add(getClass().getResource("/css/friendship-manager-window.css").toExternalForm());
@@ -172,8 +186,20 @@ public class MainWindow implements Observer {
         stage.show();
     }
 
+    public void openEventManagerWindow() throws IOException {
+        Stage stage = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminEventWindow.fxml"));
+        Scene scene = new Scene(loader.load(), 430, 640);
+        this.eventManagerController = loader.getController();
+        eventManagerController.setEventService(eventService);
+        stage.setTitle("Manage Events");
+        scene.getStylesheets().add(getClass().getResource("/css/event-manager-window.css").toExternalForm());
+        stage.setScene(scene);
+        stage.show();
+    }
+
     @Override
-    public void onNotification(String message) {
+    public void update(String message) {
         System.out.println(message);
         loadPage(currentPage);
     }
@@ -238,5 +264,31 @@ public class MainWindow implements Observer {
             return;
         }
         loadPage(currentPage - 1);
+    }
+
+    private UserRow mapToUserRow(User u) {
+        if (u == null) return null;
+
+        UserRow r = new UserRow();
+        r.setId(u.getId());
+        r.setUserType(u.getUserType());
+        r.setUsername(u.getUsername());
+        r.setEmail(u.getEmail());
+        r.setPassword(u.getPassword());
+
+        if (u instanceof Person p) {
+            r.setSurname(p.getSurname());
+            r.setName(p.getName());
+            r.setBirthDate(p.getBirthdate());
+            r.setOccupation(p.getOccupation());
+        }
+
+        if (u instanceof Duck d) {
+            r.setDuckType(d.getDuckType());
+            r.setSpeed(d.getSpeed());
+            r.setResistance(d.getResistance());
+        }
+
+        return r;
     }
 }

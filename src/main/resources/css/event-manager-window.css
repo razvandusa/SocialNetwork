@@ -3,8 +3,16 @@
     -fx-padding: 15;
 }
 
-#comboBoxLabel {
+.text-fields-container {
+    -fx-spacing: 20;
+}
+
+.event-fields-label {
     -fx-font-weight: bold;
     -fx-font-size: 15px;
     -fx-text-fill: white;
+}
+
+.event-fields-container {
+    -fx-spacing: 3;
 }

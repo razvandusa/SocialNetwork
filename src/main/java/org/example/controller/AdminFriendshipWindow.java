@@ -8,16 +8,15 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.domain.*;
 import org.example.service.FriendshipService;
-import org.example.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FriendshipManagerWindow implements Observer {
-
-    private List<Observer> observers = new ArrayList<>();
+public class AdminFriendshipWindow implements Observer {
 
     private FriendshipService friendshipService;
+
+    private List<Observer> observers = new ArrayList<>();
 
     @FXML
     private TableView<Friendship> friendshipTable;
@@ -62,7 +61,7 @@ public class FriendshipManagerWindow implements Observer {
     }
 
     @Override
-    public void onNotification(String message) {
+    public void update(String message) {
         System.out.println(message);
         loadFriendships();
     }

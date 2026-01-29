@@ -523,25 +523,9 @@ public class Console {
         System.out.print("Enter event ID: ");
         String id = scanner.nextLine();
         try {
-            List<DuckResult> results = eventService.start(id);
-
-            double total = 0;
-
-            System.out.println("=== Race Results ===");
-            for (int i = 0; i < results.size(); i++) {
-                DuckResult dr = results.get(i);
-                System.out.println(
-                        "Duck " + dr.getDuck().getId() +
-                                " on lane " + (i + 1) +
-                                ": t = " + String.format("%.3f", dr.getTime()) + " s"
-                );
-
-                total = Math.max(total, dr.getTime());
-            }
-
-            System.out.println("Total race duration = " +
-                    String.format("%.3f", total) + " s");
-
+            eventService.start(id);
+            StringBuilder results = eventService.getResults(id);
+            System.out.println(results);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -662,7 +646,7 @@ public class Console {
                 System.out.println("No lanes added yet");
             } else {
                 RaceEvent race = (RaceEvent) eventService.findById(eventId);
-                System.out.println("Lanes for event " + race.getEventName() + ":");
+                System.out.println("Lanes for event " + race.getName() + ":");
                 for (Lane lane : lanes) {
                     System.out.println(lane);
                 }

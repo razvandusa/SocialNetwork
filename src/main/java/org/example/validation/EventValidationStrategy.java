@@ -13,7 +13,7 @@ public class EventValidationStrategy implements ValidationStrategy<Event> {
 
     private void validateEventType(Event entity) {
         final Set<String> VALID_FLOCK_TYPES = Set.of("RaceEvent");
-        String flockType = entity.getEventType();
+        String flockType = entity.getType();
         if (!VALID_FLOCK_TYPES.contains(flockType)) {
             throw new FlockTypeValidationException(flockType + " is not a valid event type! Valid types are: " + VALID_FLOCK_TYPES);
         }

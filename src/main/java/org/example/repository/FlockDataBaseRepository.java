@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlockDataBaseRepository implements Repository<Long, Flock>{
+public class FlockDataBaseRepository implements FlockRepository{
     private final String url;
     private final String username;
     private final String password;
@@ -79,12 +79,13 @@ public class FlockDataBaseRepository implements Repository<Long, Flock>{
                     String duckType = rs.getString("duckType");
                     Double speed = rs.getDouble("speed");
                     Double resistance = rs.getDouble("resistance");
-                    if (duckType.equals("SWIMMING")) {
-                        flock.addDuck(new SwimmingDuck(duckId, userType, username, email, password, speed, resistance));
-                    } else if (duckType.equals("FLYING")) {
-                        flock.addDuck(new FlyingDuck(duckId, userType, username, email, password, speed, resistance));
-                    } else if (duckType.equals("FLYING_AND_SWIMMING")) {
-                        flock.addDuck(new FlyingSwimmingDuck(duckId, userType, username, email, password, speed, resistance));
+                    switch (duckType) {
+                        case "SWIMMING" ->
+                                flock.addDuck(new SwimmingDuck(duckId, userType, username, email, password, speed, resistance));
+                        case "FLYING" ->
+                                flock.addDuck(new FlyingDuck(duckId, userType, username, email, password, speed, resistance));
+                        case "FLYING_AND_SWIMMING" ->
+                                flock.addDuck(new FlyingSwimmingDuck(duckId, userType, username, email, password, speed, resistance));
                     }
                 }
                 return flock;
@@ -114,6 +115,7 @@ public class FlockDataBaseRepository implements Repository<Long, Flock>{
         return null;
     }
 
+    @Override
     public void addDuckToFlock(Long flockId, Long duckId){
         String sql = "INSERT INTO Flock_Duck(flockId, duckId) VALUES (?, ?)";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -121,9 +123,12 @@ public class FlockDataBaseRepository implements Repository<Long, Flock>{
             ps.setLong(1, flockId);
             ps.setLong(2, duckId);
             ps.executeUpdate();
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
+    @Override
     public void removeDuckFromFlock(Long flockId, Long duckId){
         String sql = "DELETE FROM Flock_Duck WHERE flockId = ? AND duckId = ?";
         try (Connection conn = DriverManager.getConnection(url, username, password);
@@ -131,6 +136,8 @@ public class FlockDataBaseRepository implements Repository<Long, Flock>{
             ps.setLong(1, flockId);
             ps.setLong(2, duckId);
             ps.executeUpdate();
-        } catch (SQLException e) {}
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

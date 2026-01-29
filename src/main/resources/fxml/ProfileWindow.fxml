@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
+<VBox styleClass="body"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.ProfileWindow"
+      spacing="25"
+      alignment="TOP_CENTER">
+
+    <StackPane prefHeight="72" style="-fx-background-color: #F4F2EF;">
+        <HBox spacing="20" alignment="CENTER_LEFT">
+            <ImageView fx:id="logoImage"
+                       fitHeight="72"
+                       pickOnBounds="true"
+                       preserveRatio="true">
+                <image>
+                    <Image url="@/images/logoApp.png"/>
+                </image>
+            </ImageView>
+        </HBox>
+        <HBox spacing="20" alignment="CENTER_RIGHT" style="-fx-padding: 0 20 0 0">
+            <Button fx:id="friendsButton" mnemonicParsing="false" onAction="#handleFriends" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;">
+                <graphic>
+                    <ImageView fitHeight="30.0" fitWidth="30.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/friendsIcon.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button fx:id="chatButton" mnemonicParsing="false" onAction="#handleMessages" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;">
+                <graphic>
+                    <ImageView fitHeight="30.0" fitWidth="30.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/chatIcon.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+            <Button fx:id="eventButton" mnemonicParsing="false" onAction="#handleEvents" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-border-radius: 5; -fx-background-radius: 5;">
+                <graphic>
+                    <ImageView fitHeight="30.0" fitWidth="30.0" preserveRatio="true">
+                        <image>
+                            <Image url="@../images/eventIcon.png" />
+                        </image>
+                    </ImageView>
+                </graphic>
+            </Button>
+        </HBox>
+    </StackPane>
+
+    <HBox alignment="CENTER_LEFT" layoutX="30.0" layoutY="100.0" prefHeight="111.0" prefWidth="299.0">
+        <ImageView fx:id="profileImage" fitHeight="111.0" fitWidth="162.0" preserveRatio="true">
+            <image>
+                <Image url="@/images/profilePicture.png" />
+            </image>
+        </ImageView>
+        <VBox alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" style="-fx-background-color: white;">
+            <Label fx:id="fullNameLabel" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+            <Label fx:id="usernameLabel" />
+        </VBox>
+    </HBox>
+
+    <VBox alignment="CENTER_LEFT" layoutX="20.0" layoutY="366.0" prefWidth="319.0" spacing="5" style="-fx-padding: 10; -fx-background-color: white;">
+        <children>
+            <VBox alignment="CENTER_LEFT" spacing="5">
+                <Label prefHeight="20.0" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Friends:" />
+                <Label fx:id="friends" prefHeight="27.0" style="-fx-font-size: 14px;" />
+                <Label prefHeight="20.0" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Occupation:" />
+                <Label fx:id="occupation" prefHeight="27.0" style="-fx-font-size: 14px;" />
+            </VBox>
+        </children>
+    </VBox>
+
+</VBox>

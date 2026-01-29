@@ -5,54 +5,65 @@ import java.util.List;
 
 public class Event extends Entity<Long> implements Subject {
 
-    private String eventType;
-    private String eventName;
+    private String type;
+    private String name;
+    private boolean status = false;
     private List<Observer> subscribers = new ArrayList<>();
 
-    public Event(Long id, String eventType, String eventName) {
+    public Event(Long id, String type, String name) {
         super(id);
-        this.eventType = eventType;
-        this.eventName = eventName;
+        this.type = type;
+        this.name = name;
     }
 
-    public String getEventType() { return eventType; }
-    public String getEventName() { return eventName; }
-    public void setEventType(String eventType) { this.eventType = eventType; }
-    public void setEventName(String eventName) { this.eventName = eventName; }
+    // Getters / Setters
+    public String getType() { return type; }
+    public String getName() { return name; }
+    public boolean getStatus() { return status; }
+    public void setType(String type) { this.type = type; }
+    public void setName(String name) { this.name = name; }
+    public void setStatus(boolean status) { this.status = status; }
 
+    // Observer pattern
     @Override
-    public void subscribe(Observer observer) {
-        this.subscribers.add(observer);
-    }
-
-    public void unsubscribe(Observer observer) {
-        this.subscribers.remove(observer);
-    }
-
-    public void notifySubscribers(String message) {
-        for (Observer observer : subscribers) {
-            observer.onNotification(message);
+    public void addObserver(Observer observer) {
+        if (!subscribers.contains(observer)) {
+            this.subscribers.add(observer);
         }
     }
 
-    public List<Observer> getSubscribers() { return subscribers; }
+    public void removeObserver(Observer observer) {
+        this.subscribers.remove(observer);
+    }
+
+    public void startEvent() {
+        notifyObservers("Event \"" + name + "\" has started!");
+    }
+
+    public void notifyObservers(String message) {
+        for (Observer observer : subscribers) {
+            observer.update(message);
+        }
+    }
+
+    public List<Observer> getSubscribers() {
+        return subscribers;
+    }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Event{");
         sb.append("id=").append(getId());
-        sb.append(", eventType='").append(eventType).append('\'');
-        sb.append(", eventName='").append(eventName).append('\'');
+        sb.append(", eventType='").append(type).append('\'');
+        sb.append(", eventName='").append(name).append('\'');
         sb.append(", subscribers=[");
-
         for (int i = 0; i < subscribers.size(); i++) {
             sb.append(((User) subscribers.get(i)).getId());
             if (i < subscribers.size() - 1) {
                 sb.append(", ");
             }
         }
-
         sb.append("]}");
         return sb.toString();
     }
